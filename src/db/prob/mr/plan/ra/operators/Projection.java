@@ -4,6 +4,7 @@ import java.util.Set;
 
 import db.prob.mr.plan.ra.RAExpression;
 import db.prob.mr.plan.ra.RAOperator;
+import db.prob.mr.plan.ra.ResultSize;
 
 public class Projection extends RAOperator {
 	RAExpression subexpression;
@@ -16,8 +17,26 @@ public class Projection extends RAOperator {
 	}
 
 	@Override
-	public int getEstimatedResultSize() {
-		return this.subexpression.getEstimatedResultSize() / 2;
+	public String toLatex() {
+		return String.format("\\Pi_{%s}(%s)", attrs.toString().replace("[", "").replace("]", ""), subexpression.toLatex());
+	}
+
+
+
+	@Override
+	public int getEstimatedResultSize(ResultSize size) {
+		int returnVal = 0;
+		switch (size) {
+		case ESTIMATION:
+			returnVal = this.subexpression.getEstimatedResultSize(size) / 2;
+			break;
+		case UPPER_BOUND:			
+			returnVal = this.subexpression.getEstimatedResultSize(size);
+			break;
+		default:
+			break;
+		}
+		return returnVal;
 	}
 
 }
