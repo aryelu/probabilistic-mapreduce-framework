@@ -10,13 +10,18 @@ public class Relation implements RAExpression {
 		this.name = name;
 	}
 
-	@Override
-	public int getEstimatedResultSize() {
-		return this.size;
-	}
-
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public String toLatex() {
+		return name;
+	}
+
+	@Override
+	public int getEstimatedResultSize(ResultSize size) {
+		return this.size;
 	}	 
 
 }
