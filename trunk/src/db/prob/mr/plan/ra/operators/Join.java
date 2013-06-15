@@ -8,7 +8,7 @@ public class Join extends RAOperator {
 	RAExpression leftSubexpr;
 	RAExpression rightSubexpr;
 	String leftAttr;
-	String rightArrt;
+	String rightAttr;
 	
 	
 	
@@ -18,7 +18,7 @@ public class Join extends RAOperator {
 		this.leftSubexpr = leftSubexpr;
 		this.rightSubexpr = rightSubexpr;
 		this.leftAttr = leftAttr;
-		this.rightArrt = rightArrt;
+		this.rightAttr = rightArrt;
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class Join extends RAOperator {
 		return String.format("%s \\bowtie_{%s=%s} %s", 
 				this.leftSubexpr.toLatex(),
 				this.leftAttr,
-				this.rightArrt,
+				this.rightAttr,
 				this.rightSubexpr.toLatex());
 	}
 
