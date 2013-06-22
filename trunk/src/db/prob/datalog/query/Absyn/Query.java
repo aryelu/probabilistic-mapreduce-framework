@@ -63,8 +63,22 @@ public class Query {
 		return head_;
 	}
 
-	public boolean is_separtion(Set<Relation> r_set_1, Set<Relation> r_set_2) {
-		return false;
+	public boolean is_separete(String Rel_a, String Rel_b) {
+		return !is_connected(Rel_a, Rel_b);
+	}
+
+	public boolean is_connected(String Rel_a, String Rel_b) {
 		// TODO
+		// Rel_a, Rel_b in Rels(q)
+		// if there's R.A=R.B and either is not in Head(q)
+		return false;
+	}
+
+	public boolean is_projection_safe(String query_added_attribute) {
+		// TODO
+		// let A = attr + query_added_attributes
+		// for every R^p in PRels(q)
+		// Gamma := A, R^p.E ==> head(q)
+		return false;
 	}
 }
