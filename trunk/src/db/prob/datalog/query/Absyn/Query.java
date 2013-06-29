@@ -88,36 +88,38 @@ public class Query {
         for (Literal l : this.body_) {
             if (l instanceof LiteralEQ) {
                 LiteralEQ leq = (LiteralEQ) l;
-                if req_set.containsAll(leq.get_terms());
+                if (req_set.containsAll(leq.get_terms())) ;
                 leq_list.add(leq);
             }
         }
         return leq_list;
     }
+
     /*
         tests if only one part of leq is in head
      */
-    private boolean test_connected(LiteralEQ leq){
+    private boolean test_connected(LiteralEQ leq) {
         // connection is how much of leq in head
         int connection = 0;
-        if (this.head_.contains(leq.term_right_)){
+        if (this.head_.contains(leq.term_right_)) {
             connection++;
         }
-        if (this.head_.contains(leq.term_left_)){
+        if (this.head_.contains(leq.term_left_)) {
             connection++;
         }
         return connection == 1;
     }
+
     /*
         assumes no literalEQ s.t. R1.a = R1.b
         so they are always for different Relations
 
         also assumes field names are different
      */
-    public boolean is_connected(String rel_a,String rel_b) {
+    public boolean is_connected(String rel_a, String rel_b) {
         // Rel_a, Rel_b in Rels(q)
         // if there's R.A=R.B and either is not in Head(q)
-        Set<String> set_from_rels=new HashSet<String>();
+        Set<String> set_from_rels = new HashSet<String>();
         Relation Ra = this.body_get_relation(rel_a);
         Set<String> Ra_attr_set = Ra.get_attr();
         set_from_rels.addAll(Ra_attr_set);
@@ -128,16 +130,17 @@ public class Query {
 
         boolean is_connected = false;
         List<LiteralEQ> leq_body = this.body_get_literaleq_by_set(set_from_rels);
-        for (LiteralEQ leq: leq_body){
+        for (LiteralEQ leq : leq_body) {
             is_connected = this.test_connected(leq);
-            if (is_connected){
+            if (is_connected) {
                 return is_connected;
             }
         }
         return is_connected;
     }
-    public boolean is_separate(String Ra, String Rb){
-        return ! this.is_connected(Ra, Rb);
+
+    public boolean is_separate(String Ra, String Rb) {
+        return !this.is_connected(Ra, Rb);
     }
 
     public boolean is_projection_safe(String query_added_attribute) {
