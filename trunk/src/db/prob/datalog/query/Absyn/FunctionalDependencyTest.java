@@ -15,6 +15,8 @@ import java.util.Set;
 public class FunctionalDependencyTest {
 
     private FunctionalDependency fd;
+    private FunctionalDependency fd2;
+    private FunctionalDependencyGroup fdg;
 
     @Before
     public void setUp() {
@@ -28,19 +30,31 @@ public class FunctionalDependencyTest {
         schema_.add("c");
         schema_.add("d");
 
+        Set<String> left2 = new HashSet<String>();
+        left2.add("c");
+        Set<String> right2 = new HashSet<String>();
+        right2.add("d");
         ISchema schema = new Relation("bla",schema_,false);
 
         fd = new FunctionalDependency(schema, left,right);
+        fd2 = new FunctionalDependency(schema, left2, right2);
+
+        HashSet<FunctionalDependency> fd_set = new HashSet<FunctionalDependency>();
+        fd_set.add(fd);
+        fd_set.add(fd2);
+        fdg = new FunctionalDependencyGroup(schema, fd_set);
     }
 
     @Test
     public void reflex(){
         Set<FunctionalDependency> power = fd.reflexivity();
-        System.out.println(power);
     }
     @Test
     public void augment(){
         Set<FunctionalDependency> power = fd.augmentation();
-        System.out.println(power);
+    }
+    @Test
+    public void trans(){
+        System.out.println(fdg.transitivity());
     }
 }

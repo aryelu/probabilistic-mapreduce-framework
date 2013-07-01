@@ -6,36 +6,18 @@ import java.util.*;
  * Created with IntelliJ IDEA. User: arye Date: 26/06/13 Time: 08:08 To change
  * this template use File | Settings | File Templates.
  */
-public class FunctionalDependency {
+public class FunctionalDependency extends IFunctionalDependency implements IFunctionalDependencyOperator, IBinaryOP<Set<String>>  {
     private ISchema schema;
-	private Set<String> left;
-	private Set<String> right;
     private Set<Set<String>> schema_attr_power;
 
+	private Set<String> left;
+	private Set<String> right;
+
     public FunctionalDependency(ISchema schema, Set<String> left, Set<String> right) {
-		this.schema = schema;
+		super(schema);
         this.left = left;
 		this.right = right;
 	}
-
-    public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
-        Set<Set<T>> sets = new HashSet<Set<T>>();
-        if (originalSet.isEmpty()) {
-            sets.add(new HashSet<T>());
-            return sets;
-        }
-        List<T> list = new ArrayList<T>(originalSet);
-        T head = list.get(0);
-        Set<T> rest = new HashSet<T>(list.subList(1, list.size()));
-        for (Set<T> set : powerSet(rest)) {
-            Set<T> newSet = new HashSet<T>();
-            newSet.add(head);
-            newSet.addAll(set);
-            sets.add(newSet);
-            sets.add(set);
-        }
-        return sets;
-    }
 
 	/*
 	 * takes two groups A, B and returns all fd {a->b | a in A, b in B}
@@ -52,14 +34,6 @@ public class FunctionalDependency {
 		return fd_set;
 	}
 
-    private Set<Set<String>> schema_attr_power(){
-        Set<Set<String>> schema_attr_power = this.schema_attr_power;
-        if (schema_attr_power == null){
-            this.schema_attr_power = powerSet(this.schema.get_attr());
-            schema_attr_power = this.schema_attr_power;
-        }
-        return schema_attr_power;
-    }
 
 	/*
 	 * apply reflexivity rule on self and return set of all possible FD for a
@@ -69,9 +43,9 @@ public class FunctionalDependency {
 	private  Set<FunctionalDependency> reflex_group() {
         Set<Set<String>> group_power = this.schema_attr_power();
 		Set<Set<String>> group_singleton = new HashSet<Set<String>>();
-		group_singleton.add(this.schema.get_attr());
+        group_singleton.add(this.schema_get_attr());
 
-		Set<FunctionalDependency> reflex_set = produce_fd_from_set(
+        Set<FunctionalDependency> reflex_set = produce_fd_from_set(
 				group_singleton, group_power);
 		return reflex_set;
 	}
@@ -93,6 +67,11 @@ public class FunctionalDependency {
         return augment_group;
     }
 
+    @Override
+    public Set<FunctionalDependency> transitivity() {
+        return new HashSet<FunctionalDependency>();
+    }
+
     private Set<FunctionalDependency> augment_group() {
         Set<Set<String>> group_power = this.schema_attr_power();
         Set<FunctionalDependency> augment_set = new HashSet<FunctionalDependency>();
@@ -110,5 +89,15 @@ public class FunctionalDependency {
 
     public String toString(){
         return left.toString() + " --> " + right.toString();
+    }
+
+    @Override
+    public Set<String> get_right() {
+        return right;
+    }
+
+    @Override
+    public Set<String> get_left() {
+        return left;
     }
 }
