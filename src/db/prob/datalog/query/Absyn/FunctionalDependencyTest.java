@@ -54,7 +54,7 @@ public class FunctionalDependencyTest {
         Set<FunctionalDependency> power = fd.augmentation();
     }
     @Test
-    public void trans(){
-        System.out.println(fdg.transitivity());
+    public void closure(){
+        System.out.println(fdg.f_closure());
     }
 }
