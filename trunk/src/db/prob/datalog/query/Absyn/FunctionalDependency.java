@@ -28,7 +28,7 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
 		Set<FunctionalDependency> fd_set = new HashSet<FunctionalDependency>();
 		for (Set<String> ls_item : left_set) {
 			for (Set<String> rs_item : right_set) {
-				fd_set.add(new FunctionalDependency(schema, ls_item, rs_item));
+				fd_set.add(new FunctionalDependency(this.get_schema(), ls_item, rs_item));
 			}
 		}
 		return fd_set;
@@ -81,7 +81,7 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
             left_with_gamma.addAll(gamma);
             Set<String> right_with_gamma = new HashSet<String>(right);
             right_with_gamma.addAll(gamma);
-            FunctionalDependency fd = new FunctionalDependency(schema, left_with_gamma, right_with_gamma);
+            FunctionalDependency fd = new FunctionalDependency(this.get_schema(), left_with_gamma, right_with_gamma);
             augment_set.add(fd);
         }
         return augment_set;
@@ -100,4 +100,26 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
     public Set<String> get_left() {
         return left;
     }
+
+    @Override
+    public boolean equals(Object fd_obj){
+        if (fd_obj instanceof FunctionalDependency){
+            FunctionalDependency fd = (FunctionalDependency) fd_obj;
+            return this.left.containsAll(fd.left) && this.right.containsAll(fd.right) && this.schema == fd.schema;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        int h = 0;
+        for (String item : this.left){
+            h +=item.hashCode();
+        }
+        for (String item : this.right){
+            h +=item.hashCode();
+        }
+        return h;
+    }
+
 }
