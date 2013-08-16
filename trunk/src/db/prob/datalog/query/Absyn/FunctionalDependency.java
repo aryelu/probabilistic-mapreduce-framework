@@ -87,6 +87,25 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
         return augment_set;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FunctionalDependency that = (FunctionalDependency) o;
+
+        if (!left.equals(that.left)) return false;
+        return right.equals(that.right);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = left.hashCode();
+        result = 31 * result + right.hashCode();
+        return result;
+    }
+
     public String toString() {
         return left.toString() + " --> " + right.toString();
     }
@@ -99,16 +118,6 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
         return left;
     }
 
-    @Override
-    public int hashCode() {
-        int h = 0;
-        for (String item : this.left) {
-            h += item.hashCode();
-        }
-        for (String item : this.right) {
-            h += item.hashCode();
-        }
-        return h;
-    }
+
 
 }
