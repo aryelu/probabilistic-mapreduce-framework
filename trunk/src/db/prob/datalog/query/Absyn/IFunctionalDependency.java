@@ -21,9 +21,9 @@ public abstract class IFunctionalDependency {
         this.schema = schema;
     }
 
-    protected Set<Set<String>> schema_attr_power(){
+    protected Set<Set<String>> schema_attr_power() {
         Set<Set<String>> schema_attr_power = this.schema_attr_power;
-        if (schema_attr_power == null){
+        if (schema_attr_power == null) {
             this.schema_attr_power = powerSet(this.schema.get_attr());
             schema_attr_power = this.schema_attr_power;
         }
@@ -48,10 +48,12 @@ public abstract class IFunctionalDependency {
         }
         return sets;
     }
-    public Set<String> schema_get_attr(){
+
+    public Set<String> schema_get_attr() {
         return schema.get_attr();
     }
-    public ISchema get_schema(){
+
+    public ISchema get_schema() {
         return this.schema;
     }
 }

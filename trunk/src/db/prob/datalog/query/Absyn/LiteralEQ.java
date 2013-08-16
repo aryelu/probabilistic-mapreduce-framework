@@ -18,9 +18,9 @@ public class LiteralEQ implements Literal {
 
 	@Override
 	public Set<String> get_attr() {
-
 		return Collections.emptySet();
 	}
+	
     public Set<String> get_terms(){
         return this.terms;
     }

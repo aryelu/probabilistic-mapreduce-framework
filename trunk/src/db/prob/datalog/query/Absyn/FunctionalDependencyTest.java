@@ -55,6 +55,6 @@ public class FunctionalDependencyTest {
     }
     @Test
     public void closure(){
-        System.out.println(fdg.f_closure());
+        Set<FunctionalDependency> power = fdg.f_closure();
     }
 }

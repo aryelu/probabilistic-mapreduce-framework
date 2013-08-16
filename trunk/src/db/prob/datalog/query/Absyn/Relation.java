@@ -17,5 +17,8 @@ public class Relation implements Literal, ISchema {
     public Set<String> get_attr() {
         return listterm_;
     }
+    public String toString(){
+		return name_;    	
+    }
 
 }
