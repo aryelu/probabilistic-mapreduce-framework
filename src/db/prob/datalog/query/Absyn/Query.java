@@ -8,11 +8,22 @@ import java.util.Set;
 public class Query {
     private String name_;
     private Set<String> head_;
-    private List<Literal> body_;
+    private List<? extends Literal> body_;
 
-    private Set<String> rels_;
-    private Set<String> prels_;
+    private Set<Relation> rels_;
+    private Set<Relation> prels_;
     private Set<String> attr_;
+
+    public Query(Query q) {
+        name_ = q.name_;
+        head_ = new HashSet<String>(q.head_);
+        body_ = q.body_;
+    }
+
+    public void  load_attr(){
+        set_attr();
+        set_allrels();
+    }
 
     private void set_attr() {
         Set<String> attr = new HashSet<String>();
@@ -23,36 +34,36 @@ public class Query {
     }
 
     private void set_allrels() {
-        Set<String> prob_rel_set = new HashSet<String>();
-        Set<String> rel_set = new HashSet<String>();
+        Set<Relation> prob_rel_set = new HashSet<Relation>();
+        Set<Relation> rel_set = new HashSet<Relation>();
         for (Literal rel : this.body_) {
             if (rel instanceof Relation) {
                 Relation rel_obj = (Relation) rel;
                 if (rel_obj.probabilistic) {
-                    prob_rel_set.add(rel_obj.name_);
+                    prob_rel_set.add(rel_obj);
                 } else {
-                    rel_set.add(rel_obj.name_);
+                    rel_set.add(rel_obj);
                 }
 
             }
         }
         this.rels_ = rel_set;
+        this.prels_ = prob_rel_set;
     }
 
-    public Query(String name, Set<String> head, List<Literal> body) {
+    public Query(String name, Set<String> head, List<? extends Literal> body) {
         name_ = name;
         head_ = head;
         body_ = body;
 
-        set_attr();
-        set_allrels();
+        load_attr();
     }
 
-    public Set<String> rels() {
+    public Set<Relation> rels() {
         return rels_;
     }
 
-    public Set<String> prels() {
+    public Set<Relation> prels() {
         return prels_;
     }
 
@@ -95,6 +106,19 @@ public class Query {
         return leq_list;
     }
 
+    /*
+        get all literalEQ
+     */
+    public  List<LiteralEQ> body_get_literaleq() {
+        List<LiteralEQ> leq_list = new LinkedList<LiteralEQ>();
+        for (Literal l : this.body_) {
+            if (l instanceof LiteralEQ) {
+                LiteralEQ leq = (LiteralEQ) l;
+                leq_list.add(leq);
+            }
+        }
+        return leq_list;
+    }
     /*
         tests if only one part of leq is in head
      */
@@ -143,11 +167,11 @@ public class Query {
         return !this.is_connected(Ra, Rb);
     }
 
-    public boolean is_projection_safe(String query_added_attribute) {
+    public boolean is_projection_safe() {
         // TODO
-        // let A = attr + query_added_attributes
         // for every R^p in PRels(q)
         // Gamma := A, R^p.E ==> head(q)
+
         return false;
     }
 }
