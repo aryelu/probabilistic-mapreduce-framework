@@ -1,5 +1,6 @@
-package db.prob.datalog.query.Absyn;
+package db.prob.datalog.query.FunctionalDependency;
 
+import db.prob.datalog.query.Absyn.ISchema;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.FloydWarshallShortestPaths;

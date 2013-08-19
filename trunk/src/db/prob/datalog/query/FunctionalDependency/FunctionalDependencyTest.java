@@ -1,5 +1,7 @@
-package db.prob.datalog.query.Absyn;
+package db.prob.datalog.query.FunctionalDependency;
 
+import db.prob.datalog.query.Absyn.ISchema;
+import db.prob.datalog.query.Absyn.Relation;
 import org.junit.*;
 
 import java.util.HashSet;
