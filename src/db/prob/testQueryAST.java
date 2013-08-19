@@ -1,7 +1,7 @@
 package db.prob;
 
 
-import db.prob.datalog.query.Absyn.*;
+import db.prob.datalog.query.FunctionalDependency.FunctionalDependency;
 
 public class testQueryAST {
 

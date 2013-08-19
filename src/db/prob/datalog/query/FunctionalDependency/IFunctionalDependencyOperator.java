@@ -1,4 +1,4 @@
-package db.prob.datalog.query.Absyn;
+package db.prob.datalog.query.FunctionalDependency;
 
 import java.util.Set;
 
