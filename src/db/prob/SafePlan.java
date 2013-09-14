@@ -55,10 +55,13 @@ public class SafePlan {
 			head = query_add_a.head();
 			head.add(a);
 			query_add_a.load_attr();
-			query_add_a.is_projection_safe();
+			if (Query.is_projection_safe(Query q, projection_head)){
+                return new Projection(safeplan(query_add_a), head);
+            }
+        }
+        // try to separate
+        q.se
 
-			// add a to head,
-			// test if safeplan
 		}
 		return null;
 	}
