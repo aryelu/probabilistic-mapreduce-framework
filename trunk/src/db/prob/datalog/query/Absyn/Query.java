@@ -167,10 +167,18 @@ public class Query {
         return !this.is_connected(Ra, Rb);
     }
 
-    public boolean is_projection_safe() {
+    public boolean is_projection_safe(Query q, List<String> projection_head) {
         // TODO
         // for every R^p in PRels(q)
         // Gamma := A, R^p.E ==> head(q)
+        Set<Relation> prel_set = q.prels();
+        List<String> stmt = new LinkedList<String>(projection_head);
+        for (Relation prel : prel_set){
+            List<String> stmt_prel = new LinkedList<String>(stmt);
+            stmt_prel.add(prel.e_attr);
+
+        }
+        stmt.add()
 
         return false;
     }
