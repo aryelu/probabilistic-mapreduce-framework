@@ -1,6 +1,7 @@
 package db.prob.datalog.query.FunctionalDependency;
 
-import db.prob.datalog.query.Absyn.ISchema;
+import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
+import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,21 +16,19 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class IFunctionalDependency {
-    private ISchema schema;
-    private Set<Set<String>> schema_attr_power;
+    private DatabaseSchema schema;
+    private Set<Set<RelationAttribute>> schema_attr_power; // cache results for schema attributes
 
 
-    public IFunctionalDependency(ISchema schema) {
+    public IFunctionalDependency(DatabaseSchema schema) {
         this.schema = schema;
     }
 
-    protected Set<Set<String>> schema_attr_power() {
-        Set<Set<String>> schema_attr_power = this.schema_attr_power;
-        if (schema_attr_power == null) {
-            this.schema_attr_power = powerSet(this.schema.get_attr());
-            schema_attr_power = this.schema_attr_power;
+    protected Set<Set<RelationAttribute>> schema_attr_power() {
+        if (this.schema_attr_power == null) {
+            this.schema_attr_power = powerSet(this.schema.get_relation_attribute());
         }
-        return schema_attr_power;
+        return this.schema_attr_power;
     }
 
     public static <T> Set<Set<T>> powerSet(Set<T> originalSet) {
@@ -51,11 +50,11 @@ public abstract class IFunctionalDependency {
         return sets;
     }
 
-    public Set<String> schema_get_attr() {
-        return schema.get_attr();
+    public Set<RelationAttribute> schema_get_attr() {
+        return schema.get_relation_attribute();
     }
 
-    public ISchema get_schema() {
+    public DatabaseSchema get_schema() {
         return this.schema;
     }
 }
