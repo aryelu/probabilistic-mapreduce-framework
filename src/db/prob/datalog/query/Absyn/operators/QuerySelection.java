@@ -6,11 +6,11 @@ import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Selection implements Literal {
+public class QuerySelection implements Literal {
     protected Relation relation;
     protected Set<RelationAttribute> attribute_set = new HashSet<RelationAttribute>();
 
-    public Selection(Relation relation, Set<String> attribute_set) {
+    public QuerySelection(Relation relation, Set<String> attribute_set) {
         this.relation = relation;
         for (String attr_name : attribute_set) {
             try {
