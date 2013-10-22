@@ -57,4 +57,11 @@ public class Relation {
         }
         throw new Exception("Not found");
     }
+    public static Set<RelationAttribute> set_to_attr(Set<Relation> relationSet){
+        Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>();
+        for( Relation relation: relationSet){
+            relationAttributeSet.addAll(relation.attribute_set);
+        }
+        return relationAttributeSet;
+    }
 }

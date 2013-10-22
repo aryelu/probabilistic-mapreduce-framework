@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Join implements Literal {
+public class QueryJoin implements Literal {
     public RelationAttribute term_left_, term_right_;
     private Set<RelationAttribute> terms = new HashSet<RelationAttribute>();
 
-    public Join(RelationAttribute term_left, RelationAttribute term_right) {
+    public QueryJoin(RelationAttribute term_left, RelationAttribute term_right) {
         term_left_ = term_left;
         term_right_ = term_right;
         terms.add(term_left);

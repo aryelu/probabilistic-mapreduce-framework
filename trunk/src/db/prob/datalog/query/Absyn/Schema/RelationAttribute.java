@@ -11,4 +11,10 @@ public class RelationAttribute {
         this.relation = relation;
         this.name = name;
     }
+    public Relation getRelation(){
+        return relation;
+    }
+    public String getName(){
+        return name;
+    }
 }

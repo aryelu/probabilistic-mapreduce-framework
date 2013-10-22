@@ -14,10 +14,10 @@ public class SafePlanTest {
     @Before
     public void setUp() throws Exception {
         Set<String> head = new HashSet<String>(Arrays.asList("a", "b", "c", "d", "e", "f"));
-        //Selection R1 = new Selection("R1", new HashSet<String>(Arrays.asList("a","b")), false);
-        //Selection R2 = new Selection("R2", new HashSet<String>(Arrays.asList("c","d")), false);
-        //Selection R3 = new Selection("R3", new HashSet<String>(Arrays.asList("e","f")), false);
-        //Join leq = new Join("b","c");
+        //QuerySelection R1 = new QuerySelection("R1", new HashSet<String>(Arrays.asList("a","b")), false);
+        //QuerySelection R2 = new QuerySelection("R2", new HashSet<String>(Arrays.asList("c","d")), false);
+        //QuerySelection R3 = new QuerySelection("R3", new HashSet<String>(Arrays.asList("e","f")), false);
+        //QueryJoin leq = new QueryJoin("b","c");
         //List<? extends Literal> body = Arrays.asList(R1, R2, leq, R3);
         //q = new Query("moshe",head,body);
     }
