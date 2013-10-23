@@ -17,4 +17,7 @@ public class RelationAttribute {
     public String getName(){
         return name;
     }
+    public String toString(){
+        return this.relation.getName() + "." + this.name;
+    }
 }

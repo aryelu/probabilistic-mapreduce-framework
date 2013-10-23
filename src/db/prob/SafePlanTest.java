@@ -1,30 +1,61 @@
 package db.prob;
 
 import db.prob.datalog.query.Absyn.Query;
+import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
+import db.prob.datalog.query.Absyn.Schema.Relation;
+import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
+import db.prob.datalog.query.Absyn.operators.Literal;
+import db.prob.datalog.query.Absyn.operators.QueryJoin;
+import db.prob.datalog.query.Absyn.operators.QuerySelection;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class SafePlanTest {
-    Query q;
 
     @Before
     public void setUp() throws Exception {
-        Set<String> head = new HashSet<String>(Arrays.asList("a", "b", "c", "d", "e", "f"));
-        //QuerySelection R1 = new QuerySelection("R1", new HashSet<String>(Arrays.asList("a","b")), false);
-        //QuerySelection R2 = new QuerySelection("R2", new HashSet<String>(Arrays.asList("c","d")), false);
-        //QuerySelection R3 = new QuerySelection("R3", new HashSet<String>(Arrays.asList("e","f")), false);
-        //QueryJoin leq = new QueryJoin("b","c");
-        //List<? extends Literal> body = Arrays.asList(R1, R2, leq, R3);
-        //q = new Query("moshe",head,body);
+
     }
 
     @Test
-    public void test_simple_case() {
-        //SafePlan.safeplan(schema, q);
+    public void test_simple_case() throws Exception {
+        Relation R1 = new Relation("R1", new HashSet<String>(Arrays.asList("a", "b")), false);
+        Relation S1 = new Relation("S1", new HashSet<String>(Arrays.asList("c", "d")), false);
+        DatabaseSchema db = new DatabaseSchema(new HashSet<Relation>(Arrays.asList(R1, S1)));
+        HashSet<RelationAttribute> head = new HashSet<RelationAttribute>(Arrays.asList(R1.get_attr_by_name("a"),
+                R1.get_attr_by_name("b"),
+                S1.get_attr_by_name("c"),
+                S1.get_attr_by_name("d")
+                ));
+        QuerySelection select_R = new QuerySelection(R1,new HashSet<String>(Arrays.asList("a","b")));
+        QuerySelection select_S = new QuerySelection(S1,new HashSet<String>(Arrays.asList("c","d")));
+        QueryJoin join_b_c = new QueryJoin(R1.get_attr_by_name("b"), S1.get_attr_by_name("c"));
+        List<Literal> body = Arrays.asList(select_R, select_S, join_b_c);
+        Query q = new Query(db,"shoki", head, body);
+        System.out.println(SafePlan.safeplan(q));
+    }
+    @Test
+    public void test_second_case() throws Exception {
+        Relation R1 = new Relation("R1", new HashSet<String>(Arrays.asList("a", "b")), true);
+        Relation S1 = new Relation("S1", new HashSet<String>(Arrays.asList("c", "d")), true);
+        DatabaseSchema db = new DatabaseSchema(new HashSet<Relation>(Arrays.asList(R1, S1)));
+        HashSet<RelationAttribute> head = new HashSet<RelationAttribute>(Arrays.asList(
+                R1.get_attr_by_name("b"),
+                S1.get_attr_by_name("c"),
+                S1.get_attr_by_name("d")
+        ));
+        QuerySelection select_R = new QuerySelection(R1,new HashSet<String>(Arrays.asList("a","b")));
+        QuerySelection select_S = new QuerySelection(S1,new HashSet<String>(Arrays.asList("c","d")));
+        QueryJoin join_b_c = new QueryJoin(R1.get_attr_by_name("b"), S1.get_attr_by_name("c"));
+        List<Literal> body = Arrays.asList(select_R, select_S, join_b_c);
+        Query q = new Query(db,"shoki", head, body);
+
+        System.out.println(SafePlan.safeplan(q).toLatex());
     }
 
 }

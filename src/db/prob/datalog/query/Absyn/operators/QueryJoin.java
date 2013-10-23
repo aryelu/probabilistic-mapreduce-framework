@@ -25,4 +25,7 @@ public class QueryJoin implements Literal {
     public Set<RelationAttribute> get_terms() {
         return this.terms;
     }
+    public String toString(){
+        return "Join on " + this.term_left_ + "=" + this.term_right_;
+    }
 }

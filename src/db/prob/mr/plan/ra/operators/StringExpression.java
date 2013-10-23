@@ -25,6 +25,9 @@ public class StringExpression implements RAExpression {
 
     @Override
     public String toLatex() {
-        return null;
+        return this.text;
+    }
+    public String toString(){
+        return this.text;
     }
 }
