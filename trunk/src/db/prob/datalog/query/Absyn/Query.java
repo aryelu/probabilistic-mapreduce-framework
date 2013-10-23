@@ -46,6 +46,7 @@ public class Query {
     }
 
     public Query(Query q) {
+        schema = q.schema;
         name = q.name;
         head = new HashSet<RelationAttribute>(q.head);
         body = new LinkedList<Literal>(q.body);
@@ -90,21 +91,34 @@ public class Query {
         return new_query;
     }
 
-    public boolean is_separated(String Rel_a, String Rel_b) {
-        return !is_connected(Rel_a, Rel_b);
-    }
-
-    private QuerySelection body_get_relation(String relation_name) {
+    public QuerySelection body_get_selection(Relation relation) {
         for (Literal l : this.body) {
             if (l instanceof QuerySelection) {
                 QuerySelection l_Query_selection = (QuerySelection) l;
-                if (l_Query_selection.getRelation().getName().equals(relation_name)) {
+                if (l_Query_selection.getRelation().equals(relation)) {
                     return l_Query_selection;
                 }
             }
         }
         return null;
     }
+    private List<Literal> get_literal_by_relation_set(Set<Relation> relationConnectedSet) {
+        List<Literal> literalSet = new LinkedList<Literal>();
+        for (Relation relation:relationConnectedSet){
+            literalSet.add(this.body_get_selection(relation));
+            literalSet.addAll(this.body_get_literaleq_by_relation(relation));
+        }
+        return literalSet;
+    }
+
+    public Set<RelationAttribute> body_get_attribute_by_set(Set<Relation> relationSet){
+        Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>();
+        for (Relation relation:relationSet){
+            relationAttributeSet.addAll(this.body_get_selection(relation).get_attr());
+        }
+        return relationAttributeSet;
+    }
+
 
     /*
         select_set : set of attributes which LiterlEQ should be in
@@ -115,6 +129,19 @@ public class Query {
             if (l instanceof QueryJoin) {
                 QueryJoin leq = (QueryJoin) l;
                 if (req_set.containsAll(leq.get_terms())) {
+                    leq_list.add(leq);
+                }
+            }
+        }
+        return leq_list;
+    }
+    private List<QueryJoin> body_get_literaleq_by_relation(Relation relation) {
+        List<QueryJoin> leq_list = new LinkedList<QueryJoin>();
+        for (Literal l : this.body) {
+            if (l instanceof QueryJoin) {
+                QueryJoin leq = (QueryJoin) l;
+                if (relation.get_attr().contains(leq.term_right_) &&
+                        relation.get_attr().contains(leq.term_left_)){
                     leq_list.add(leq);
                 }
             }
@@ -157,16 +184,16 @@ public class Query {
 
         also assumes field names are different
      */
-    public boolean is_connected(String rel_a, String rel_b) {
+    public boolean is_connected(Relation rel_a, Relation rel_b) {
         //TODO test if works
         // Rel_a, Rel_b in Rels(q)
         // if there's R.A=R.B and either is not in Head(q)
         Set<RelationAttribute> set_from_rels = new HashSet<RelationAttribute>();
-        QuerySelection Ra = this.body_get_relation(rel_a);
+        QuerySelection Ra = this.body_get_selection(rel_a);
         Set<RelationAttribute> Ra_attr_set = Ra.get_attr();
         set_from_rels.addAll(Ra_attr_set);
 
-        QuerySelection Rb = this.body_get_relation(rel_b);
+        QuerySelection Rb = this.body_get_selection(rel_b);
         Set<RelationAttribute> Rb_attr_set = Rb.get_attr();
         set_from_rels.addAll(Rb_attr_set);
 
@@ -183,10 +210,6 @@ public class Query {
         return is_connected;
     }
 
-    public boolean is_separate(String Ra, String Rb) {
-        return !this.is_connected(Ra, Rb);
-    }
-
     public static boolean is_projection_safe(Query query, Set<RelationAttribute> projection_head) {
         // TODO
         // for every R^p in PRels(q)
@@ -199,21 +222,23 @@ public class Query {
         fd_set.addAll(query.get_fd_set());
 
         Set<Relation> prel_set = query.probabilisticRelationSet;
-        boolean is_safe = true;
-        for (Relation prel : prel_set) {
-            if (is_safe) {
-                Set<RelationAttribute> query_head_and_probabilistic = new HashSet<RelationAttribute>();
-                query_head_and_probabilistic.addAll(projection_head);
-                RelationAttribute probabilistic_attribute = prel.getProbabilistic_attribute();
-                query_head_and_probabilistic.add(probabilistic_attribute);
+        boolean is_safe = false;
+        if (!prel_set.isEmpty()) {
+            for (Relation prel : prel_set) {
+                if (is_safe) {
+                    Set<RelationAttribute> query_head_and_probabilistic = new HashSet<RelationAttribute>();
+                    query_head_and_probabilistic.addAll(projection_head);
+                    RelationAttribute probabilistic_attribute = prel.getProbabilistic_attribute();
+                    query_head_and_probabilistic.add(probabilistic_attribute);
 
-                FunctionalDependencyGroup fdg = new FunctionalDependencyGroup(schema, fd_set);
-                FunctionalDependency fd_to_find = new FunctionalDependency(schema, query_head_and_probabilistic, query.head);
-                is_safe = fdg.statisfy(fd_to_find);
-            } else {
-                break;
+                    FunctionalDependencyGroup fdg = new FunctionalDependencyGroup(schema, fd_set);
+                    FunctionalDependency fd_to_find = new FunctionalDependency(schema, query_head_and_probabilistic, query.head);
+                    is_safe = fdg.statisfy(fd_to_find);
+                } else {
+                    break;
+                }
+
             }
-
         }
         return is_safe;
     }
@@ -261,4 +286,15 @@ public class Query {
     public String getName() {
         return name;
     }
+
+    public Query project_on_relation_set(Set<Relation> relationConnectedSet,String name ) {
+        DatabaseSchema schema_ = this.schema;
+        String name_ = this.name + name;
+        List<Literal> body_ = this.get_literal_by_relation_set(relationConnectedSet);
+        Set<RelationAttribute> head_ = this.body_get_attribute_by_set(relationConnectedSet);
+        Query query_new = new Query(schema_, name_,head_, body_ );
+        return query_new;
+    }
+
+
 }

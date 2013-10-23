@@ -27,7 +27,7 @@ public class SafePlan {
      * return any plan for them
      */
     private static RAExpression simple_query_to_plan(Query q) {
-        return new StringExpression("Simple query");
+        return new StringExpression("Simple query:\nhead:" + q.getHead() + "\nbody:" + q.getBody());
     }
 
     private static QuerySelection get_relation(Set<QuerySelection> R, String col_name) {
@@ -77,23 +77,23 @@ public class SafePlan {
      * The nodes of G(q) are Rels(q) and the edges are all pairs (Ri,Rj) of connected relations,
      * i.e. q contains some join condition Ri.A = Rj.B with either Ri.A or Rj.B not in Head(q).
      * Find the connected components of G
-     * @param q
+     * @param query
      * @return Join of q1,q2 s.t. they separate q
      */
-    private static Join split_to_separate_join(Query q) throws Exception {
+    private static Join split_to_separate_join(Query query) throws Exception {
         UndirectedGraph<Relation, DefaultEdge> constraint_graph =
                 new SimpleGraph<Relation, DefaultEdge>(DefaultEdge.class);
 
-        for (Relation relation : q.getRelationSet()) {
+        for (Relation relation : query.getRelationSet()) {
             constraint_graph.addVertex(relation);
         }
 
         // add all connected components
-        List<QueryJoin> queryJoinSet = q.body_get_literaleq();
+        List<QueryJoin> queryJoinSet = query.body_get_literaleq();
         for (QueryJoin queryJoin: queryJoinSet){
             RelationAttribute relationA = queryJoin.term_left_;
             RelationAttribute relationB = queryJoin.term_right_;
-            if (q.is_connected(relationA.getName(), relationB.getName())){
+            if (query.is_connected(relationA.getRelation(), relationB.getRelation())){
                 constraint_graph.addEdge(relationA.getRelation(), relationB.getRelation());
             }
         }
@@ -106,19 +106,12 @@ public class SafePlan {
 
         List<Set<Relation>> relationConnectedSet = connectivityInspector.connectedSets();
         if (relationConnectedSet.size() == 2){
-            Set<RelationAttribute> query_head = q.getHead();
-
+            // find leq and remove it
             Set<Relation> relationConnectedSet_left = relationConnectedSet.get(0);
-            Set<RelationAttribute> left_query_attr = Relation.set_to_attr(relationConnectedSet_left);
-            left_query_attr.removeAll(query_head);
-
-            Query left_query = new Query(q.getSchema(),q.getName()+"l", left_query_attr, q.getBody());
-
+            Query left_query = query.project_on_relation_set(relationConnectedSet_left, "l");
             Set<Relation> relationConnectedSet_right = relationConnectedSet.get(1);
-            Set<RelationAttribute> right_query_attr = Relation.set_to_attr(relationConnectedSet_right);
-            right_query_attr.removeAll(query_head);
+            Query right_query = query.project_on_relation_set(relationConnectedSet_right , "r");
 
-            Query right_query = new Query(q.getSchema(),q.getName()+"r", right_query_attr, q.getBody());
             // TODO add string to Join
             return new Join(safeplan(left_query), safeplan(right_query), "","");
         }

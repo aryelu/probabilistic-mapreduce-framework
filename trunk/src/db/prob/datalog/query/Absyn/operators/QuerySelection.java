@@ -26,7 +26,7 @@ public class QuerySelection implements Literal {
     }
 
     public String toString() {
-        return this.relation.toString();
+        return "Select " +this.attribute_set + " from " + this.relation.getName();
     }
 
     public Relation getRelation() {

@@ -64,4 +64,7 @@ public class Relation {
         }
         return relationAttributeSet;
     }
+    public String  toString(){
+        return this.name;
+    }
 }
