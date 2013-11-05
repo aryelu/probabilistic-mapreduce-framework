@@ -9,29 +9,30 @@ import java.util.Set;
  * Represents schema for Database
  */
 public class DatabaseSchema {
-    private Set<Relation> relation_set;
+    private Set<Relation> relations;
 
     public DatabaseSchema(Set<Relation> relation_set) {
-        this.relation_set = relation_set;
+        this.relations = relation_set;
     }
 
-    /*
-        traverse DB schema's relations and produces all functional dependencies
-        from relations,
+    /**
+     * Traverse schema's relations and produces all functional dependencies
+     * from relations,
+     * @return
      */
-    public Set<FunctionalDependency> get_fd_set() {
-        Set<FunctionalDependency> fd_set = new HashSet<FunctionalDependency>();
-        for (Relation relation : this.relation_set) {
+    public Set<FunctionalDependency> getFdSet() {
+        Set<FunctionalDependency> fdSet = new HashSet<FunctionalDependency>();
+        for (Relation relation : this.relations) {
             Set<FunctionalDependency> relationfunctionalDependencySet =
                     FunctionalDependency.functional_dependency_from_attribute(this, relation.getAttribute_set());
-            fd_set.addAll(relationfunctionalDependencySet);
+            fdSet.addAll(relationfunctionalDependencySet);
         }
-        return fd_set;
+        return fdSet;
     }
 
     public Set<RelationAttribute> get_relation_attribute() {
         Set<RelationAttribute> attr_set = new HashSet<RelationAttribute>();
-        for (Relation relation : this.relation_set) {
+        for (Relation relation : this.relations) {
             attr_set.addAll(relation.get_attr());
         }
         return attr_set;

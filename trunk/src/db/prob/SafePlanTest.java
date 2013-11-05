@@ -7,6 +7,8 @@ import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 import db.prob.datalog.query.Absyn.operators.Literal;
 import db.prob.datalog.query.Absyn.operators.QueryJoin;
 import db.prob.datalog.query.Absyn.operators.QuerySelection;
+import db.prob.mr.plan.ra.RAExpression;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,17 +29,21 @@ public class SafePlanTest {
         Relation R1 = new Relation("R1", new HashSet<String>(Arrays.asList("a", "b")), false);
         Relation S1 = new Relation("S1", new HashSet<String>(Arrays.asList("c", "d")), false);
         DatabaseSchema db = new DatabaseSchema(new HashSet<Relation>(Arrays.asList(R1, S1)));
-        HashSet<RelationAttribute> head = new HashSet<RelationAttribute>(Arrays.asList(R1.get_attr_by_name("a"),
-                R1.get_attr_by_name("b"),
-                S1.get_attr_by_name("c"),
-                S1.get_attr_by_name("d")
-                ));
-        QuerySelection select_R = new QuerySelection(R1,new HashSet<String>(Arrays.asList("a","b")));
-        QuerySelection select_S = new QuerySelection(S1,new HashSet<String>(Arrays.asList("c","d")));
-        QueryJoin join_b_c = new QueryJoin(R1.get_attr_by_name("b"), S1.get_attr_by_name("c"));
-        List<Literal> body = Arrays.asList(select_R, select_S, join_b_c);
+		HashSet<RelationAttribute> head = new HashSet<RelationAttribute>(
+				Arrays.asList(
+						R1.getAttrByName("a"),
+						R1.getAttrByName("b"), 
+						S1.getAttrByName("c"),
+						S1.getAttrByName("d")
+					)
+			);
+        QuerySelection selectR = new QuerySelection(R1,new HashSet<String>(Arrays.asList("a","b")));
+        QuerySelection selectS = new QuerySelection(S1,new HashSet<String>(Arrays.asList("c","d")));
+        QueryJoin joinBC = new QueryJoin(R1.getAttrByName("b"), S1.getAttrByName("c"));
+        List<Literal> body = Arrays.asList(selectR, selectS, joinBC);
         Query q = new Query(db,"shoki", head, body);
-        System.out.println(SafePlan.safeplan(q));
+        RAExpression out = SafePlan.safeplan(q);
+        System.out.println(out);
     }
     @Test
     public void test_second_case() throws Exception {
@@ -45,17 +51,17 @@ public class SafePlanTest {
         Relation S1 = new Relation("S1", new HashSet<String>(Arrays.asList("c", "d")), true);
         DatabaseSchema db = new DatabaseSchema(new HashSet<Relation>(Arrays.asList(R1, S1)));
         HashSet<RelationAttribute> head = new HashSet<RelationAttribute>(Arrays.asList(
-                R1.get_attr_by_name("b"),
-                S1.get_attr_by_name("c"),
-                S1.get_attr_by_name("d")
+                R1.getAttrByName("b"),
+                S1.getAttrByName("c"),
+                S1.getAttrByName("d")
         ));
         QuerySelection select_R = new QuerySelection(R1,new HashSet<String>(Arrays.asList("a","b")));
         QuerySelection select_S = new QuerySelection(S1,new HashSet<String>(Arrays.asList("c","d")));
-        QueryJoin join_b_c = new QueryJoin(R1.get_attr_by_name("b"), S1.get_attr_by_name("c"));
+        QueryJoin join_b_c = new QueryJoin(R1.getAttrByName("b"), S1.getAttrByName("c"));
         List<Literal> body = Arrays.asList(select_R, select_S, join_b_c);
         Query q = new Query(db,"shoki", head, body);
-
-        System.out.println(SafePlan.safeplan(q).toLatex());
+        RAExpression out = SafePlan.safeplan(q);
+        System.out.println(out.toLatex());
     }
 
 }

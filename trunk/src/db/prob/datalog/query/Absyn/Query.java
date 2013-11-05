@@ -218,7 +218,7 @@ public class Query {
         // create induced functional dependencies GAMMA^p(q) on Attr(q)
         // take all FDs from schema
         DatabaseSchema schema = query.getSchema();
-        Set<FunctionalDependency> fd_set = schema.get_fd_set();
+        Set<FunctionalDependency> fd_set = schema.getFdSet();
         fd_set.addAll(query.get_fd_set());
 
         Set<Relation> prel_set = query.probabilisticRelationSet;

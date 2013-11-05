@@ -27,7 +27,7 @@ public class SafePlan {
      * return any plan for them
      */
     private static RAExpression simple_query_to_plan(Query q) {
-        return new StringExpression("Simple query:\nhead:" + q.getHead() + "\nbody:" + q.getBody());
+        return new StringExpression("SQ: head:(" + q.getHead() + ") (body:" + q.getBody() +")");
     }
 
     private static QuerySelection get_relation(Set<QuerySelection> R, String col_name) {

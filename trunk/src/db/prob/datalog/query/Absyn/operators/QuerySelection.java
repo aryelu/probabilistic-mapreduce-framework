@@ -14,7 +14,7 @@ public class QuerySelection implements Literal {
         this.relation = relation;
         for (String attr_name : attribute_set) {
             try {
-                this.attribute_set.add(relation.get_attr_by_name(attr_name));
+                this.attribute_set.add(relation.getAttrByName(attr_name));
             } catch (Exception e) {
                 e.printStackTrace();
             }

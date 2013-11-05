@@ -49,7 +49,7 @@ public class Relation {
         return probabilistic_attribute;
     }
 
-    public RelationAttribute get_attr_by_name(String attr_name) throws Exception {
+    public RelationAttribute getAttrByName(String attr_name) throws Exception {
         for (RelationAttribute relationAttribute : this.getAttribute_set()) {
             if (relationAttribute.name.equals(attr_name)) {
                 return relationAttribute;
