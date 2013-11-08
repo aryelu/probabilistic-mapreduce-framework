@@ -1,3 +1,4 @@
 *.class
 *.xml
 .idea/
+probabilistic-mapreduce-framework.iml
