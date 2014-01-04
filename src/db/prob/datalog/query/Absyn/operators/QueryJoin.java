@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Literal item of the form R1.a = R2.b
+ */
 public class QueryJoin implements Literal {
     public RelationAttribute term_left_, term_right_;
     private Set<RelationAttribute> terms = new HashSet<RelationAttribute>();
@@ -17,15 +20,21 @@ public class QueryJoin implements Literal {
         terms.add(term_right);
     }
 
+    /**
+     * No attributes are referenced in join
+     *
+     * @return
+     */
     @Override
-    public Set<RelationAttribute> get_attr() {
+    public Set<RelationAttribute> getAttributes() {
         return Collections.emptySet();
     }
 
-    public Set<RelationAttribute> get_terms() {
+    public Set<RelationAttribute> getTerms() {
         return this.terms;
     }
-    public String toString(){
+
+    public String toString() {
         return "Join on " + this.term_left_ + "=" + this.term_right_;
     }
 }
