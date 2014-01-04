@@ -43,7 +43,7 @@ public class SafePlanTest {
         QueryJoin joinBC = new QueryJoin(R1.getAttrByName("b"), S1.getAttrByName("c"));
         List<Literal> body = Arrays.asList(selectR, selectS, joinBC);
         Query q = new Query(db, "shoki", head, body);
-        RAExpression out = SafePlan.safeplan(q);
+        RAExpression out = SafePlan.buildSafePlan(q);
         System.out.println(out);
     }
 
@@ -63,7 +63,7 @@ public class SafePlanTest {
         QueryJoin join_b_c = new QueryJoin(R1.getAttrByName("b"), S1.getAttrByName("c"));
         List<Literal> body = Arrays.asList(select_R, select_S, join_b_c);
         Query q = new Query(db, "shoki", head, body);
-        RAExpression out = SafePlan.safeplan(q);
+        RAExpression out = SafePlan.buildSafePlan(q);
         System.out.println(out.toLatex());
     }
 

@@ -29,14 +29,16 @@ public class SafePlan {
      * @return
      */
     private static RAExpression simple_query_to_plan(Query query) {
+        // TODO - break into joins
+
         return new StringExpression("SQ: head:(" + query.getHead() + ") (body:" + query.getBody() + ")");
     }
 
     /**
      * Builds set of strings for all attributes for toString method
      *
-     * @param relationAttributeSet
-     * @return
+     * @param relationAttributeSet Attribute set to be printed
+     * @return String representation of the set
      */
     public static Set<String> SetToString(Set<RelationAttribute> relationAttributeSet) {
         Set<String> stringSet = new HashSet<String>();
@@ -47,11 +49,11 @@ public class SafePlan {
     }
 
     /**
-     * @param query
-     * @return
+     * @param query Query to build safe plan for
+     * @return Safe plan for query if exists
      * @throws Exception
      */
-    public static RAExpression safeplan(Query query) throws Exception {
+    public static RAExpression buildSafePlan(Query query) throws Exception {
         Set<RelationAttribute> head = query.getHead();
         Set<RelationAttribute> attr = query.getAttribues();
         Set<RelationAttribute> diff = new HashSet<RelationAttribute>(head);
@@ -65,14 +67,12 @@ public class SafePlan {
             // create new query with diff_attr in it's head
             Query query_add_a = query.query_add_head(diff_attr);
             if (Query.isProjectionSafe(query_add_a, query.getHead())) {
-
-                return new Projection(safeplan(query_add_a), SetToString(head));
+                return new Projection(buildSafePlan(query_add_a), SetToString(head));
             }
         }
-        // TODO separate
         // split query to into q1 join q2
         // s.t. every R1 in rels(q1), R2 in rels(q2): R1,R2 are separated
-        Join splited_queries = SafePlan.split_to_separate_join(query);
+        Join splited_queries = SafePlan.splitToSeparateJoin(query);
         return splited_queries;
     }
 
@@ -82,28 +82,28 @@ public class SafePlan {
      * i.e. q contains some join condition Ri.A = Rj.B with either Ri.A or Rj.B not in Head(q).
      * Find the connected components of G
      *
-     * @param query
+     * @param query Query to split
      * @return Join of q1,q2 s.t. they separate q
      */
-    private static Join split_to_separate_join(Query query) throws Exception {
-        UndirectedGraph<Relation, DefaultEdge> constraint_graph =
+    private static Join splitToSeparateJoin(Query query) throws Exception {
+        UndirectedGraph<Relation, DefaultEdge> constraintGraph =
                 new SimpleGraph<Relation, DefaultEdge>(DefaultEdge.class);
 
         for (Relation relation : query.getRelationSet()) {
-            constraint_graph.addVertex(relation);
+            constraintGraph.addVertex(relation);
         }
 
         // add all connected components
-        List<QueryJoin> queryJoinSet = query.body_get_all_join();
+        List<QueryJoin> queryJoinSet = query.bodyGetAllJoin();
         for (QueryJoin queryJoin : queryJoinSet) {
-            RelationAttribute relationA = queryJoin.term_left_;
-            RelationAttribute relationB = queryJoin.term_right_;
+            RelationAttribute relationA = queryJoin.termLeft;
+            RelationAttribute relationB = queryJoin.termRight;
             if (query.isConnected(relationA.getRelation(), relationB.getRelation())) {
-                constraint_graph.addEdge(relationA.getRelation(), relationB.getRelation());
+                constraintGraph.addEdge(relationA.getRelation(), relationB.getRelation());
             }
         }
         ConnectivityInspector<Relation, DefaultEdge> connectivityInspector =
-                new ConnectivityInspector<Relation, DefaultEdge>(constraint_graph);
+                new ConnectivityInspector<Relation, DefaultEdge>(constraintGraph);
 
         if (connectivityInspector.isGraphConnected()) {
             throw new Exception("Failed to split due to connected graph");
@@ -111,15 +111,26 @@ public class SafePlan {
 
         List<Set<Relation>> relationConnectedSet = connectivityInspector.connectedSets();
         if (relationConnectedSet.size() == 2) {
-            // find leq and remove it
+            // find all leq that has one node in first set and second in the second set
+
             Set<Relation> relationConnectedSet_left = relationConnectedSet.get(0);
             Query left_query = query.project_on_relation_set(relationConnectedSet_left, "l");
+
             Set<Relation> relationConnectedSet_right = relationConnectedSet.get(1);
             Query right_query = query.project_on_relation_set(relationConnectedSet_right, "r");
 
+            List<QueryJoin> queryJoinList = query.bodyGetJoinsBetweenConnectedSet(relationConnectedSet_left, relationConnectedSet_right);
+
+            // TODO deduct there is always one
+            // select first
+            QueryJoin queryJoin = queryJoinList.get(0);
+            RelationAttribute left = queryJoin.termLeft;
+            RelationAttribute right = queryJoin.termRight;
+
             // TODO add string to Join
-            return new Join(safeplan(left_query), safeplan(right_query), "", "");
+            return new Join(buildSafePlan(left_query), buildSafePlan(right_query), left.getName(), right.getName());
         }
+        // TODO - handle more than two connected sets
         // build new Queries from this,
         // head, and body
         return null;
