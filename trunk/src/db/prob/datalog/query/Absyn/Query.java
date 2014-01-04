@@ -98,7 +98,6 @@ public class Query {
 
     /**
      * gets selection from query where relation participates
-     * <p/>
      * assuming there is only one or less occurrences of it in query's body
      *
      * @param relation
@@ -159,8 +158,8 @@ public class Query {
         for (Literal l : this.body) {
             if (l instanceof QueryJoin) {
                 QueryJoin leq = (QueryJoin) l;
-                if (relation.get_attr().contains(leq.term_right_) &&
-                        relation.get_attr().contains(leq.term_left_)) {
+                if (relation.get_attr().contains(leq.termRight) &&
+                        relation.get_attr().contains(leq.termLeft)) {
                     leq_list.add(leq);
                 }
             }
@@ -171,7 +170,7 @@ public class Query {
     /**
      * @return list of all QueryJoin in body
      */
-    public List<QueryJoin> body_get_all_join() {
+    public List<QueryJoin> bodyGetAllJoin() {
         List<QueryJoin> leq_list = new LinkedList<QueryJoin>();
         for (Literal l : this.body) {
             if (l instanceof QueryJoin) {
@@ -191,10 +190,10 @@ public class Query {
     private boolean test_connected(QueryJoin queryJoin) {
         // connection is how much of leq in head
         int connection = 0;
-        if (this.head.contains(queryJoin.term_right_)) {
+        if (this.head.contains(queryJoin.termRight)) {
             connection++;
         }
-        if (this.head.contains(queryJoin.term_left_)) {
+        if (this.head.contains(queryJoin.termLeft)) {
             connection++;
         }
         return connection == 1;
@@ -288,12 +287,12 @@ public class Query {
         Set<FunctionalDependency> fd_set = new HashSet<FunctionalDependency>();
 
         // For every join predicate Ri.A=Rj.B, both Ri.A->Rj.B and Rj.B->Ri.A
-        for (QueryJoin leq : this.body_get_all_join()) {
-            RelationAttribute left = leq.term_left_;
+        for (QueryJoin leq : this.bodyGetAllJoin()) {
+            RelationAttribute left = leq.termLeft;
             Set<RelationAttribute> left_set = new HashSet<RelationAttribute>();
             left_set.add(left);
 
-            RelationAttribute right = leq.term_right_;
+            RelationAttribute right = leq.termRight;
             Set<RelationAttribute> right_set = new HashSet<RelationAttribute>();
             right_set.add(right);
 
@@ -339,5 +338,29 @@ public class Query {
         return newQuery;
     }
 
+    /**
+     * gets the join between two connected components
+     * gets all attributes from both sets, and finds leq between them
+     *
+     * @param relationConnectedSetLeft
+     * @param relationConnectedSetRight
+     * @return
+     */
+    public List<QueryJoin> bodyGetJoinsBetweenConnectedSet(Set<Relation> relationConnectedSetLeft, Set<Relation> relationConnectedSetRight) {
+        Set<RelationAttribute> leftSet = this.body_get_attribute_by_set(relationConnectedSetLeft);
+        Set<RelationAttribute> rightSet = this.body_get_attribute_by_set(relationConnectedSetRight);
 
+        List<QueryJoin> leq_list = new LinkedList<QueryJoin>();
+        for (Literal l : this.body) {
+            if (l instanceof QueryJoin) {
+                QueryJoin leq = (QueryJoin) l;
+                // if leq left is in the left set and leq right is i the right set, or vice versa
+                if ((leftSet.contains(leq.termLeft) && rightSet.contains(leq.termRight)) ||
+                        leftSet.contains(leq.termRight) && rightSet.contains(leq.termLeft)) {
+                    leq_list.add(leq);
+                }
+            }
+        }
+        return leq_list;
+    }
 }

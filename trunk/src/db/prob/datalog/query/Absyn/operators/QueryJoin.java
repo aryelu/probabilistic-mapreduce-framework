@@ -10,12 +10,12 @@ import java.util.Set;
  * Literal item of the form R1.a = R2.b
  */
 public class QueryJoin implements Literal {
-    public RelationAttribute term_left_, term_right_;
+    public RelationAttribute termLeft, termRight;
     private Set<RelationAttribute> terms = new HashSet<RelationAttribute>();
 
     public QueryJoin(RelationAttribute term_left, RelationAttribute term_right) {
-        term_left_ = term_left;
-        term_right_ = term_right;
+        termLeft = term_left;
+        termRight = term_right;
         terms.add(term_left);
         terms.add(term_right);
     }
@@ -35,6 +35,6 @@ public class QueryJoin implements Literal {
     }
 
     public String toString() {
-        return "Join on " + this.term_left_ + "=" + this.term_right_;
+        return "Join on " + this.termLeft + "=" + this.termRight;
     }
 }
