@@ -21,12 +21,12 @@ public class QuerySelection implements Literal {
         }
     }
 
-    public Set<RelationAttribute> get_attr() {
+    public Set<RelationAttribute> getAttributes() {
         return attribute_set;
     }
 
     public String toString() {
-        return "Select " +this.attribute_set + " from " + this.relation.getName();
+        return "Select " + this.attribute_set + " from " + this.relation.getName();
     }
 
     public Relation getRelation() {
