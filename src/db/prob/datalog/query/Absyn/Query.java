@@ -314,6 +314,27 @@ public class Query {
         return head;
     }
 
+    public Set<String> getHeadToStringSet() {
+        Set<String> stringSet = new HashSet<String>();
+        for (RelationAttribute relationAttribute : head) {
+            stringSet.add(relationAttribute.getName());
+        }
+        return stringSet;
+    }
+
+    public String getHeadAsString() {
+        Set<String> stringSet = this.getHeadToStringSet();
+        String ans = "";
+        for (String str : stringSet) {
+            if (!ans.equals("")) {
+                ans = ans + "," + str;
+            } else {
+                ans = str;
+            }
+        }
+        return ans;
+    }
+
     public List<? extends Literal> getBody() {
         return body;
     }

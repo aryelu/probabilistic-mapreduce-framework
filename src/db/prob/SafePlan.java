@@ -7,7 +7,7 @@ import db.prob.datalog.query.Absyn.operators.QueryJoin;
 import db.prob.mr.plan.ra.RAExpression;
 import db.prob.mr.plan.ra.operators.Join;
 import db.prob.mr.plan.ra.operators.Projection;
-import db.prob.mr.plan.ra.operators.StringExpression;
+import db.prob.mr.plan.ra.operators.Selection;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
@@ -23,15 +23,51 @@ import java.util.Set;
  */
 public class SafePlan {
     /**
+     * Breaks simple query to join expressions
+     *
+     * @param query original query
+     * @return Join tree
+     */
+    private static RAExpression getJoins(Query query) throws Exception {
+        List<QueryJoin> queryJoinList = query.bodyGetAllJoin();
+        if (!queryJoinList.isEmpty()) {
+            QueryJoin queryJoin = queryJoinList.get(0);
+
+            Set<Relation> removeLeftRelationSet = new HashSet<Relation>();
+            Relation left_relation = queryJoin.getLeftRelation();
+            removeLeftRelationSet.add(left_relation);
+            Query query_without_left = query.project_on_relation_set(removeLeftRelationSet, "removed_" + left_relation.getName());
+
+            Set<Relation> removeRightRelationSet = new HashSet<Relation>();
+            Relation right_relation = queryJoin.getRightRelation();
+            removeRightRelationSet.add(right_relation);
+            Query query_without_right = query.project_on_relation_set(removeRightRelationSet, "removed_" + right_relation.getName());
+
+            RAExpression ans = new Join(SafePlan.getJoins(query_without_right), SafePlan.getJoins(query_without_left), queryJoin.getLeftName(), queryJoin.getRightName());
+            return ans;
+        }
+        // no joins left then select with what we have
+        // need to be from the same relation
+        Set<Relation> relationSet = query.getRelationSet();
+        if (!relationSet.isEmpty() && relationSet.size() == 1) {
+            Relation relation = (Relation) relationSet.toArray()[0];
+            String head = query.getHeadAsString();
+            RAExpression ans = new Selection(new db.prob.mr.plan.ra.Relation(1, relation.getName()), head);
+            return ans;
+        }
+        throw new Exception("Can't figure out");
+    }
+
+    /**
      * Creates a plan in simple case where Attr(query) == Head(query)
      *
      * @param query
      * @return
      */
-    private static RAExpression simple_query_to_plan(Query query) {
-        // TODO - break into joins
-
-        return new StringExpression("SQ: head:(" + query.getHead() + ") (body:" + query.getBody() + ")");
+    private static RAExpression simple_query_to_plan(Query query) throws Exception {
+        // turn body into joins
+        Projection proj = new Projection(SafePlan.getJoins(query), query.getHeadToStringSet());
+        return proj;
     }
 
     /**
@@ -65,6 +101,7 @@ public class SafePlan {
         }
         for (RelationAttribute diff_attr : diff) {
             // create new query with diff_attr in it's head
+
             Query query_add_a = query.query_add_head(diff_attr);
             if (Query.isProjectionSafe(query_add_a, query.getHead())) {
                 return new Projection(buildSafePlan(query_add_a), SetToString(head));
@@ -72,7 +109,7 @@ public class SafePlan {
         }
         // split query to into q1 join q2
         // s.t. every R1 in rels(q1), R2 in rels(q2): R1,R2 are separated
-        Join splited_queries = SafePlan.splitToSeparateJoin(query);
+        RAExpression splited_queries = SafePlan.splitToSeparateJoin(query);
         return splited_queries;
     }
 

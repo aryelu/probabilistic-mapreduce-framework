@@ -44,7 +44,7 @@ public class SafePlanTest {
         List<Literal> body = Arrays.asList(selectR, selectS, joinBC);
         Query q = new Query(db, "shoki", head, body);
         RAExpression out = SafePlan.buildSafePlan(q);
-        System.out.println(out);
+        System.out.println(out.toLatex());
     }
 
     @Test

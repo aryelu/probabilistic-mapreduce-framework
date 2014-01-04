@@ -1,14 +1,14 @@
 package db.prob.mr.plan.ra;
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Test;
 
 import db.prob.mr.plan.ra.operators.Join;
 import db.prob.mr.plan.ra.operators.Projection;
 import db.prob.mr.plan.ra.operators.Selection;
+import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class RAExpressionTest {
