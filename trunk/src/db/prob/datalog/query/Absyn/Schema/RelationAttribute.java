@@ -1,7 +1,8 @@
 package db.prob.datalog.query.Absyn.Schema;
 
 /**
- * attribute fields for relations
+ * Attribute for probability value.
+ * Used only in probabilistic relations.
  */
 public class RelationAttribute {
     protected Relation relation;
@@ -11,12 +12,15 @@ public class RelationAttribute {
         this.relation = relation;
         this.name = name;
     }
+    
     public Relation getRelation(){
         return relation;
     }
+    
     public String getName(){
         return name;
     }
+    
     public String toString(){
         return this.relation.getName() + "." + this.name;
     }

@@ -1,12 +1,12 @@
 package db.prob.datalog.query.FunctionalDependency;
 
-import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
-import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
+import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 
 /**
  * Created with IntelliJ IDEA.

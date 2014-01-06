@@ -1,17 +1,18 @@
 package db.prob.datalog.query.FunctionalDependency;
 
-import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
-import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
+import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 
 /**
  * Created with IntelliJ IDEA.

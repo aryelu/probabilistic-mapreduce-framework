@@ -1,7 +1,6 @@
 package db.prob.mr.plan.ra.operators;
 
 import db.prob.mr.plan.ra.RAExpression;
-import db.prob.mr.plan.ra.RAOperator;
 import db.prob.mr.plan.ra.ResultSize;
 
 /**

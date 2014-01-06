@@ -1,8 +1,8 @@
 package db.prob.datalog.query.Absyn.operators;
 
-import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
-
 import java.util.Set;
+
+import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 
 /**
  * item in query's body
