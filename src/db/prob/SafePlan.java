@@ -1,5 +1,14 @@
 package db.prob;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.jgrapht.UndirectedGraph;
+import org.jgrapht.alg.ConnectivityInspector;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
+
 import db.prob.datalog.query.Absyn.Query;
 import db.prob.datalog.query.Absyn.Schema.Relation;
 import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
@@ -7,15 +16,6 @@ import db.prob.datalog.query.Absyn.operators.QueryJoin;
 import db.prob.mr.plan.ra.RAExpression;
 import db.prob.mr.plan.ra.operators.Join;
 import db.prob.mr.plan.ra.operators.Projection;
-import db.prob.mr.plan.ra.operators.Selection;
-import org.jgrapht.UndirectedGraph;
-import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * implements safe plan algorithm input: Query in datalog like notation output:

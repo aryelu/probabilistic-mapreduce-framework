@@ -1,5 +1,6 @@
 package db.prob.datalog.query.Absyn.Schema;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,41 +9,60 @@ import java.util.Set;
  * holds it attributes
  */
 public class Relation {
-    // name
+	
+	/**
+	 * Name of relation 
+	 */
     private String name;
-    // set of attributes for relation
+    
+    /**
+     * The attributes (or features) of the relation.
+     */
     private Set<RelationAttribute> attribute_set = new HashSet<RelationAttribute>();
-    // tells if this relation is a probabilistic one
-    private boolean probabilistic;
-    //if it's probabilistic then this is the Event attribute
+    
+    /**
+     * flag if this is a probabilistic relation.
+     */
+    private boolean isProb;
+    
+    /**
+     * an attribute that is used only for probabilistic relations.
+     * This attribute contains the probability itself.
+     */
     private RelationAttribute probabilistic_attribute;
 
-    public Relation(String name, Set<String> attribute_name_set, boolean probabilistic) {
+    /**
+     * Constructor of a relation.
+     * 
+     * @param name Name of relation.
+     * @param attributesNames set of attributes
+     * @param isProb flag whether its probabilistic 
+     */
+    public Relation(String name, Set<String> attributesNames, boolean isProb) {
         this.name = name;
-        for (String attr_name : attribute_name_set) {
+        for (String attr_name : attributesNames) {
             this.attribute_set.add(new RelationAttribute(this, attr_name));
         }
-        this.probabilistic = probabilistic;
-        if (probabilistic) {
+        this.isProb = isProb;
+        if (isProb) {
             this.probabilistic_attribute = new RelationAttribute(this, "Event");
         }
     }
-
-
-    public Set<RelationAttribute> get_attr() {
-        return getAttribute_set();
+    
+    public Relation(String name, String[] attrNames, boolean isProb) {
+    	this(name, new HashSet<String>(Arrays.asList(attrNames)), isProb);
     }
 
     public String getName() {
         return name;
     }
 
-    public Set<RelationAttribute> getAttribute_set() {
+    public Set<RelationAttribute> getAttributesSet() {
         return attribute_set;
     }
 
     public boolean is_probabilistic() {
-        return probabilistic;
+        return isProb;
     }
 
     public RelationAttribute getProbabilistic_attribute() {
@@ -50,7 +70,7 @@ public class Relation {
     }
 
     public RelationAttribute getAttrByName(String attr_name) throws Exception {
-        for (RelationAttribute relationAttribute : this.getAttribute_set()) {
+        for (RelationAttribute relationAttribute : this.getAttributesSet()) {
             if (relationAttribute.name.equals(attr_name)) {
                 return relationAttribute;
             }
