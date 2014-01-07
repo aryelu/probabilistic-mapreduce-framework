@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class Query {
     private DatabaseSchema schema;
-    
+
     /**
      * name of query.
      */
@@ -53,8 +53,6 @@ public class Query {
     private Set<RelationAttribute> attributes = new HashSet<RelationAttribute>();
 
     /**
-     * 
-     * 
      * @param schema
      * @param name
      * @param head
@@ -72,7 +70,7 @@ public class Query {
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param q
      */
     public Query(Query q) {
@@ -354,27 +352,6 @@ public class Query {
         return stringSet;
     }
 
-    public String getHeadAsString() {
-        Set<String> stringSet = this.getHeadToStringSet();
-        String ans = "";
-        for (String str : stringSet) {
-            if (!ans.equals("")) {
-                ans = ans + "," + str;
-            } else {
-                ans = str;
-            }
-        }
-        return ans;
-    }
-
-    public List<? extends Literal> getBody() {
-        return body;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     /**
      * Creates a new query with only relationConnectedSet involved
      *
@@ -422,15 +399,15 @@ public class Query {
         return leq_list;
     }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(this.head);
-		sb.append(" :- ");
-		sb.append(this.body);
-		
-		return sb.toString();
-	}
-    
-    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.head);
+        sb.append(" :- ");
+        sb.append(this.body);
+
+        return sb.toString();
+    }
+
+
 }

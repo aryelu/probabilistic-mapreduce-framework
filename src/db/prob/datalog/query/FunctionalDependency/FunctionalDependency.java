@@ -60,7 +60,7 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
         return FunctionalDependency.produceFdFromSet(schema, singleton, powerSet);
     }
 
-    /*
+    /**
      * apply reflexivity rule on self and return set of all possible FD for a
      * set of attributes A, any subset b<A then A->b
      *
@@ -84,8 +84,8 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
     }
 
 
-    /*
-      if a --> b and c is set of attr then ca --> cb
+    /**
+     * if a --> b and c is set of attr then ca --> cb
      */
     public Set<FunctionalDependency> augmentation() {
         Set<RelationAttribute> group_power = this.schema_get_attr();
@@ -101,6 +101,7 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
         }
         return augment_set;
     }
+
 
     @Override
     public Set<FunctionalDependency> transitivity() {
