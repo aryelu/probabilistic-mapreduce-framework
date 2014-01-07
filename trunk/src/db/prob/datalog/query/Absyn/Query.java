@@ -385,8 +385,13 @@ public class Query {
     public Query project_on_relation_set(Set<Relation> relationConnectedSet, String name) {
         DatabaseSchema databaseSchema = this.schema;
         String newQueryName = this.name + name;
+        Set<RelationAttribute> validAttribute = new HashSet<RelationAttribute>();
+        for (Relation relation : relationConnectedSet) {
+            validAttribute.addAll(relation.getAttributesSet());
+        }
+        Set<RelationAttribute> newQueryHead = new HashSet<RelationAttribute>(this.head);
+        newQueryHead.retainAll(validAttribute);
         List<Literal> newQueryBody = this.get_literal_by_relation_set(relationConnectedSet);
-        Set<RelationAttribute> newQueryHead = this.body_get_attribute_by_set(relationConnectedSet);
         Query newQuery = new Query(databaseSchema, newQueryName, newQueryHead, newQueryBody);
         return newQuery;
     }
