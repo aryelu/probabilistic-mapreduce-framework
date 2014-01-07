@@ -11,11 +11,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
  * User: arye
- * Date: 29/06/13
- * Time: 13:16
- * To change this template use File | Settings | File Templates.
+ *
+ * Contains methods to be used on group of Functional Dependencies:
+ * main purpose of this class is to compute it's closures
  */
 public class FunctionalDependencyGroup extends IFunctionalDependency implements IFunctionalDependencyOperator {
 
