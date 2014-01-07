@@ -1,18 +1,14 @@
 package db.prob.datalog.query.FunctionalDependency;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.FloydWarshallShortestPaths;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-
 import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
 import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
+import org.jgrapht.alg.TransitiveClosure;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,8 +49,8 @@ public class FunctionalDependencyGroup extends IFunctionalDependency implements 
         // take all rules and build graph from them.
         // now we can, BFS,DFS, Floyd, or Matrix
         Set<FunctionalDependency> fd_transitive = new HashSet<FunctionalDependency>();
-        DirectedGraph<Set<RelationAttribute>, DefaultEdge> dg =
-                new DefaultDirectedGraph<Set<RelationAttribute>, DefaultEdge>(DefaultEdge.class);
+        SimpleDirectedGraph<Set<RelationAttribute>, DefaultEdge> dg =
+                new SimpleDirectedGraph<Set<RelationAttribute>, DefaultEdge>(DefaultEdge.class);
         Set<Set<RelationAttribute>> p = this.schema_attr_power();
 
         for (Set<RelationAttribute> x : p) {
@@ -63,15 +59,16 @@ public class FunctionalDependencyGroup extends IFunctionalDependency implements 
         for (FunctionalDependency fd : this.fd_set) {
             Set<RelationAttribute> left = fd.get_left();
             Set<RelationAttribute> right = fd.get_right();
-            dg.addEdge(left, right);
-        }
-        FloydWarshallShortestPaths<Set<RelationAttribute>, DefaultEdge> fwsp = new FloydWarshallShortestPaths(dg);
-        for (Set<RelationAttribute> origin : dg.vertexSet()) {
-            List<GraphPath<Set<RelationAttribute>, DefaultEdge>> dest_list = fwsp.getShortestPaths(origin);
-            for (GraphPath<Set<RelationAttribute>, DefaultEdge> dest_path : dest_list) {
-                Set<RelationAttribute> dest = dest_path.getEndVertex();
-                fd_transitive.add(new FunctionalDependency(this.get_schema(), origin, dest));
+            if (!left.equals(right)) {
+                dg.addEdge(left, right);
             }
+        }
+        TransitiveClosure.INSTANCE.closeSimpleDirectedGraph(dg);
+        Set<DefaultEdge> edgeSet = dg.edgeSet();
+        for (DefaultEdge de : edgeSet) {
+            Set<RelationAttribute> source = dg.getEdgeSource(de);
+            Set<RelationAttribute> target = dg.getEdgeTarget(de);
+            fd_transitive.add(new FunctionalDependency(this.get_schema(), source, target));
         }
         return fd_transitive;
     }
@@ -79,6 +76,7 @@ public class FunctionalDependencyGroup extends IFunctionalDependency implements 
     public Set<FunctionalDependency> f_closure() {
         Set<FunctionalDependency> fd_closure_before = Collections.emptySet();
         Set<FunctionalDependency> fd_closure_curr = this.fd_set;
+        //TODO remove self refrencing
         while (!fd_closure_before.equals(fd_closure_curr)) {
             fd_closure_before = new HashSet<FunctionalDependency>(this.fd_set);
             this.fd_set.addAll(this.reflexivity());
@@ -90,7 +88,8 @@ public class FunctionalDependencyGroup extends IFunctionalDependency implements 
     }
 
     public boolean statisfy(FunctionalDependency fd) {
-        return this.f_closure().contains(fd);
+        Set<FunctionalDependency> closure = this.f_closure();
+        return closure.contains(fd);
     }
 
 }

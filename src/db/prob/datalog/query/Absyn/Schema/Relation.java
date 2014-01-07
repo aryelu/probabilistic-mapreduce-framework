@@ -9,22 +9,22 @@ import java.util.Set;
  * holds it attributes
  */
 public class Relation {
-	
-	/**
-	 * Name of relation 
-	 */
+
+    /**
+     * Name of relation
+     */
     private String name;
-    
+
     /**
      * The attributes (or features) of the relation.
      */
     private Set<RelationAttribute> attribute_set = new HashSet<RelationAttribute>();
-    
+
     /**
      * flag if this is a probabilistic relation.
      */
     private boolean isProb;
-    
+
     /**
      * an attribute that is used only for probabilistic relations.
      * This attribute contains the probability itself.
@@ -33,10 +33,10 @@ public class Relation {
 
     /**
      * Constructor of a relation.
-     * 
-     * @param name Name of relation.
+     *
+     * @param name            Name of relation.
      * @param attributesNames set of attributes
-     * @param isProb flag whether its probabilistic 
+     * @param isProb          flag whether its probabilistic
      */
     public Relation(String name, Set<String> attributesNames, boolean isProb) {
         this.name = name;
@@ -45,12 +45,12 @@ public class Relation {
         }
         this.isProb = isProb;
         if (isProb) {
-            this.probabilistic_attribute = new RelationAttribute(this, "Event");
+            this.probabilistic_attribute = new RelationAttribute(this, "E");
         }
     }
-    
+
     public Relation(String name, String[] attrNames, boolean isProb) {
-    	this(name, new HashSet<String>(Arrays.asList(attrNames)), isProb);
+        this(name, new HashSet<String>(Arrays.asList(attrNames)), isProb);
     }
 
     public String getName() {
@@ -61,12 +61,22 @@ public class Relation {
         return attribute_set;
     }
 
+    public Set<RelationAttribute> getAttributesSetAndProb() {
+        Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>(attribute_set);
+        relationAttributeSet.add(probabilistic_attribute);
+        return relationAttributeSet;
+    }
+
     public boolean is_probabilistic() {
         return isProb;
     }
 
     public RelationAttribute getProbabilistic_attribute() {
         return probabilistic_attribute;
+    }
+
+    public Set<RelationAttribute> getProbabilisticAttributeAsSet() {
+        return new HashSet<RelationAttribute>(Arrays.asList(probabilistic_attribute));
     }
 
     public RelationAttribute getAttrByName(String attr_name) throws Exception {
@@ -77,14 +87,8 @@ public class Relation {
         }
         throw new Exception("Not found");
     }
-    public static Set<RelationAttribute> set_to_attr(Set<Relation> relationSet){
-        Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>();
-        for( Relation relation: relationSet){
-            relationAttributeSet.addAll(relation.attribute_set);
-        }
-        return relationAttributeSet;
-    }
-    public String  toString(){
+
+    public String toString() {
         return this.name;
     }
 }

@@ -1,13 +1,5 @@
 package db.prob;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import db.prob.datalog.query.Absyn.Query;
 import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
 import db.prob.datalog.query.Absyn.Schema.Relation;
@@ -17,6 +9,13 @@ import db.prob.datalog.query.Absyn.operators.QueryJoin;
 import db.prob.datalog.query.Absyn.operators.QuerySelection;
 import db.prob.datalog.query.FunctionalDependency.FunctionalDependency;
 import db.prob.mr.plan.ra.RAExpression;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SafePlanTest {
 
@@ -25,7 +24,6 @@ public class SafePlanTest {
 
     }
 
-    @Test
     public void testSimpleCase() throws Exception {
         Relation R1 = new Relation("R1", new String[]{"a", "b"}, false);
         Relation S1 = new Relation("S1", new String[]{"c", "d"}, false);
@@ -54,7 +52,6 @@ public class SafePlanTest {
         System.out.println(out.toLatex());
     }
 
-    @Test
     public void testSecondCase() throws Exception {
         Relation R1 = new Relation("R1", new String[] {"a", "b"}, true);
         Relation S1 = new Relation("S1", new String[] {"c", "d"}, true);
@@ -86,17 +83,17 @@ public class SafePlanTest {
     	Relation relationT = new Relation("T", new String[] {"C","D"}, true);
     	Set<FunctionalDependency> fdSet = new HashSet<FunctionalDependency>();
     	DatabaseSchema db = new DatabaseSchema(new Relation[] {relationS, relationT}, fdSet);
-    	
-    	Set<RelationAttribute> left  = new HashSet<RelationAttribute>();
+
+        Set<RelationAttribute> left  = new HashSet<RelationAttribute>();
     	Set<RelationAttribute> right = new HashSet<RelationAttribute>();
-    	left.add(new RelationAttribute(relationT, "C"));
-    	right.add(new RelationAttribute(relationT, "D"));
-    	
-    	// C -> D
+        left.add(relationT.getAttrByName("C"));
+        right.add(relationT.getAttrByName("D"));
+
+        // C -> D
     	FunctionalDependency fd1 = new FunctionalDependency(db, left, right);
     	fdSet.add(fd1);
-    	
-    	// Now the query:
+
+        // Now the query:
         HashSet<RelationAttribute> head = new HashSet<RelationAttribute>();
         head.add(relationT.getAttrByName("D"));
     	

@@ -1,10 +1,10 @@
 package db.prob.datalog.query.FunctionalDependency;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
 import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * a Functional dependency A -> B.
@@ -66,12 +66,16 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
      *
      */
     private Set<FunctionalDependency> reflex_group() {
+        // TODO reflex on group at hand
         Set<Set<RelationAttribute>> group_power = this.schema_attr_power();
         Set<Set<RelationAttribute>> group_singleton = new HashSet<Set<RelationAttribute>>();
         group_singleton.add(this.schema_get_attr());
 
         Set<FunctionalDependency> reflex_set = produceFdFromSet(this.get_schema(),
                 group_singleton, group_power);
+
+        reflex_set.addAll(produceFdFromSet(this.get_schema(),
+                group_singleton, group_power));
         return reflex_set;
     }
 
@@ -119,7 +123,7 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
 
         FunctionalDependency that = (FunctionalDependency) o;
 
-        return left.equals(that.left) && right.equals(that.right);
+        return left.containsAll(that.left) && right.containsAll(that.right);
 
     }
 

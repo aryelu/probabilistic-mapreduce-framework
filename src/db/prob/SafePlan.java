@@ -1,21 +1,21 @@
 package db.prob;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import db.prob.datalog.query.Absyn.Query;
+import db.prob.datalog.query.Absyn.Schema.Relation;
+import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
+import db.prob.datalog.query.Absyn.operators.QueryJoin;
+import db.prob.datalog.query.FunctionalDependency.IFunctionalDependency;
+import db.prob.mr.plan.ra.RAExpression;
+import db.prob.mr.plan.ra.operators.Join;
+import db.prob.mr.plan.ra.operators.Projection;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import db.prob.datalog.query.Absyn.Query;
-import db.prob.datalog.query.Absyn.Schema.Relation;
-import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
-import db.prob.datalog.query.Absyn.operators.QueryJoin;
-import db.prob.mr.plan.ra.RAExpression;
-import db.prob.mr.plan.ra.operators.Join;
-import db.prob.mr.plan.ra.operators.Projection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * implements safe plan algorithm input: Query in datalog like notation output:
@@ -92,18 +92,19 @@ public class SafePlan {
     public static RAExpression buildSafePlan(Query query) throws Exception {
         Set<RelationAttribute> head = query.getHead();
         Set<RelationAttribute> attr = query.getAttribues();
-        Set<RelationAttribute> diff = new HashSet<RelationAttribute>(head);
-        diff.removeAll(attr);
+        Set<RelationAttribute> diff = new HashSet<RelationAttribute>(attr);
+        Set<Set<RelationAttribute>> diff_pow = IFunctionalDependency.powerSet(diff);
+        diff.removeAll(head);
 
         if (head.equals(attr)) {
             // make plan from query as-is and return it
             return simple_query_to_plan(query);
         }
-        for (RelationAttribute diff_attr : diff) {
+        for (Set<RelationAttribute> diff_attr : diff_pow) {
             // create new query with diff_attr in it's head
 
             Query query_add_a = query.query_add_head(diff_attr);
-            if (Query.isProjectionSafe(query_add_a, query.getHead())) {
+            if (Query.isProjectionSafe(query_add_a, head)) {
                 return new Projection(buildSafePlan(query_add_a), SetToString(head));
             }
         }
@@ -123,6 +124,7 @@ public class SafePlan {
      * @return Join of q1,q2 s.t. they separate q
      */
     private static Join splitToSeparateJoin(Query query) throws Exception {
+        // TODO check if the spilt partition query head
         UndirectedGraph<Relation, DefaultEdge> constraintGraph =
                 new SimpleGraph<Relation, DefaultEdge>(DefaultEdge.class);
 
@@ -164,7 +166,6 @@ public class SafePlan {
             RelationAttribute left = queryJoin.termLeft;
             RelationAttribute right = queryJoin.termRight;
 
-            // TODO add string to Join
             return new Join(buildSafePlan(left_query), buildSafePlan(right_query), left.getName(), right.getName());
         }
         // TODO - handle more than two connected sets
