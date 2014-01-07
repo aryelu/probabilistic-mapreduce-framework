@@ -41,7 +41,7 @@ public class DatabaseSchema {
             Set<FunctionalDependency> relationfunctionalDependencySet =
                     FunctionalDependency.functional_dependency_from_attribute(this, relationAttributeSet);
             fdSet.addAll(relationfunctionalDependencySet);
-            FunctionalDependency eventFD = new FunctionalDependency(this, relationAttributeSet, relation.getProbabilisticAttributeAsSet());
+            FunctionalDependency eventFD = new FunctionalDependency(this, relation.getProbabilisticAttributeAsSet(), relationAttributeSet);
             fdSet.add(eventFD);
         }
         fdSet.addAll(this.fdSet);

@@ -82,6 +82,8 @@ public class Query {
         body = new LinkedList<Literal>(q.body);
         probabilisticRelationSet = new HashSet<Relation>(q.probabilisticRelationSet);
         relationSet = new HashSet<Relation>(q.relationSet);
+        setAttributes();
+        setAllRelations();
     }
 
     public Set<Relation> getRelationSet() {
@@ -119,10 +121,10 @@ public class Query {
      * @param attr attribute to be added
      * @return new query
      */
-    public Query query_add_head(Set<RelationAttribute> attr) {
+    public Query query_add_head(RelationAttribute attr) {
         Query new_query = new Query(this);
         new_query.name = this.name + "_" + attr;
-        new_query.head.addAll(attr);
+        new_query.head.add(attr);
         return new_query;
     }
 

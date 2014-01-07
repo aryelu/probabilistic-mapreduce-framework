@@ -4,7 +4,6 @@ import db.prob.datalog.query.Absyn.Query;
 import db.prob.datalog.query.Absyn.Schema.Relation;
 import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 import db.prob.datalog.query.Absyn.operators.QueryJoin;
-import db.prob.datalog.query.FunctionalDependency.IFunctionalDependency;
 import db.prob.mr.plan.ra.RAExpression;
 import db.prob.mr.plan.ra.operators.Join;
 import db.prob.mr.plan.ra.operators.Projection;
@@ -93,14 +92,13 @@ public class SafePlan {
         Set<RelationAttribute> head = query.getHead();
         Set<RelationAttribute> attr = query.getAttribues();
         Set<RelationAttribute> diff = new HashSet<RelationAttribute>(attr);
-        Set<Set<RelationAttribute>> diff_pow = IFunctionalDependency.powerSet(diff);
         diff.removeAll(head);
 
         if (head.equals(attr)) {
             // make plan from query as-is and return it
             return simple_query_to_plan(query);
         }
-        for (Set<RelationAttribute> diff_attr : diff_pow) {
+        for (RelationAttribute diff_attr : diff) {
             // create new query with diff_attr in it's head
 
             Query query_add_a = query.query_add_head(diff_attr);
