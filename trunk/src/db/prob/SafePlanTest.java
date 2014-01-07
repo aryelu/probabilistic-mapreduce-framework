@@ -24,6 +24,7 @@ public class SafePlanTest {
 
     }
 
+    @Test
     public void testSimpleCase() throws Exception {
         Relation R1 = new Relation("R1", new String[]{"a", "b"}, false);
         Relation S1 = new Relation("S1", new String[]{"c", "d"}, false);
@@ -52,6 +53,7 @@ public class SafePlanTest {
         System.out.println(out.toLatex());
     }
 
+    @Test
     public void testSecondCase() throws Exception {
         Relation R1 = new Relation("R1", new String[] {"a", "b"}, true);
         Relation S1 = new Relation("S1", new String[] {"c", "d"}, true);
