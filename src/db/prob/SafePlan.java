@@ -50,7 +50,6 @@ public class SafePlan {
         Set<Relation> relationSet = query.getRelationSet();
         if (!relationSet.isEmpty() && relationSet.size() == 1) {
             Relation relation = (Relation) relationSet.toArray()[0];
-            Set<String> head = query.getHeadToStringSet();
             RAExpression ans = new db.prob.mr.plan.ra.Relation(1, relation.getName());
             return ans;
         }
