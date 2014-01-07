@@ -1,10 +1,10 @@
 package db.prob.datalog.query.Absyn.Schema;
 
+import db.prob.datalog.query.FunctionalDependency.FunctionalDependency;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import db.prob.datalog.query.FunctionalDependency.FunctionalDependency;
 
 /**
  * Represents schema for Database
@@ -37,9 +37,12 @@ public class DatabaseSchema {
     public Set<FunctionalDependency> getFdSet() {
         Set<FunctionalDependency> fdSet = new HashSet<FunctionalDependency>();
         for (Relation relation : this.relations) {
+            Set<RelationAttribute> relationAttributeSet = relation.getAttributesSet();
             Set<FunctionalDependency> relationfunctionalDependencySet =
-                    FunctionalDependency.functional_dependency_from_attribute(this, relation.getAttributesSet());
+                    FunctionalDependency.functional_dependency_from_attribute(this, relationAttributeSet);
             fdSet.addAll(relationfunctionalDependencySet);
+            FunctionalDependency eventFD = new FunctionalDependency(this, relationAttributeSet, relation.getProbabilisticAttributeAsSet());
+            fdSet.add(eventFD);
         }
         fdSet.addAll(this.fdSet);
         return fdSet;
@@ -48,7 +51,7 @@ public class DatabaseSchema {
     public Set<RelationAttribute> get_relation_attribute() {
         Set<RelationAttribute> attr_set = new HashSet<RelationAttribute>();
         for (Relation relation : this.relations) {
-            attr_set.addAll(relation.getAttributesSet());
+            attr_set.addAll(relation.getAttributesSetAndProb());
         }
         return attr_set;
     }
