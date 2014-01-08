@@ -24,6 +24,12 @@ public class DatabaseSchema {
         this.fdSet = fdSet;
     }
     
+    /**
+     * Constructor of database schema
+     * 
+     * @param relations array of {@link Relation}
+     * @param fdSet     set of {@link FunctionalDependency}
+     */
     public DatabaseSchema(Relation[] relations, Set<FunctionalDependency> fdSet) {
     	this(new HashSet<Relation>(Arrays.asList(relations)), fdSet);
     }

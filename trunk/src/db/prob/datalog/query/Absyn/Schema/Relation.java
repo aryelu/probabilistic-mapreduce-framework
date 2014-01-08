@@ -18,7 +18,7 @@ public class Relation {
     /**
      * The attributes (or features) of the relation.
      */
-    private Set<RelationAttribute> attribute_set = new HashSet<RelationAttribute>();
+    private Set<RelationAttribute> attributes = new HashSet<RelationAttribute>();
 
     /**
      * flag if this is a probabilistic relation.
@@ -41,7 +41,7 @@ public class Relation {
     public Relation(String name, Set<String> attributesNames, boolean isProb) {
         this.name = name;
         for (String attr_name : attributesNames) {
-            this.attribute_set.add(new RelationAttribute(this, attr_name));
+            this.attributes.add(new RelationAttribute(this, attr_name));
         }
         this.isProb = isProb;
         if (isProb) {
@@ -49,6 +49,13 @@ public class Relation {
         }
     }
 
+    /**
+     * Constructor for {@link Relation} instance.
+     * 
+     * @param name      name of the relation.
+     * @param attrNames the attributes
+     * @param isProb    flag whether its probabilistic
+     */
     public Relation(String name, String[] attrNames, boolean isProb) {
         this(name, new HashSet<String>(Arrays.asList(attrNames)), isProb);
     }
@@ -58,16 +65,21 @@ public class Relation {
     }
 
     public Set<RelationAttribute> getAttributesSet() {
-        return attribute_set;
+        return attributes;
     }
 
     public Set<RelationAttribute> getAttributesSetAndProb() {
-        Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>(attribute_set);
+        Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>(attributes);
         relationAttributeSet.add(probabilistic_attribute);
         return relationAttributeSet;
     }
 
-    public boolean is_probabilistic() {
+    /**
+     * whether this is a probabilistic relation.
+     * 
+     * @return
+     */
+    public boolean isProb() {
         return isProb;
     }
 

@@ -105,7 +105,7 @@ public class Query {
             if (literal instanceof QuerySelection) {
                 QuerySelection querySelection = (QuerySelection) literal;
                 Relation relation = querySelection.getRelation();
-                if (relation.is_probabilistic()) {
+                if (relation.isProb()) {
                     this.probabilisticRelationSet.add(relation);
                 }
                 this.relationSet.add(relation);
