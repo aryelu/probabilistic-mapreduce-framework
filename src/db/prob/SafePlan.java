@@ -74,7 +74,7 @@ public class SafePlan {
      * @param relationAttributeSet Attribute set to be printed
      * @return String representation of the set
      */
-    public static Set<String> SetToString(Set<RelationAttribute> relationAttributeSet) {
+    public static Set<String> setToString(Set<RelationAttribute> relationAttributeSet) {
         Set<String> stringSet = new HashSet<String>();
         for (RelationAttribute relationAttribute : relationAttributeSet) {
             stringSet.add(relationAttribute.toString());
@@ -83,6 +83,8 @@ public class SafePlan {
     }
 
     /**
+     * Builds a safe execution plan for the given query.
+     * 
      * @param query Query to build safe plan for
      * @return Safe plan for query if exists
      * @throws Exception
@@ -102,7 +104,7 @@ public class SafePlan {
 
             Query query_add_a = query.query_add_head(diff_attr);
             if (Query.isProjectionSafe(query_add_a, head)) {
-                return new Projection(buildSafePlan(query_add_a), SetToString(head));
+                return new Projection(buildSafePlan(query_add_a), setToString(head));
             }
         }
         // split query to into q1 join q2

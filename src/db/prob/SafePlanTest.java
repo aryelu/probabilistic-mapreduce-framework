@@ -9,6 +9,7 @@ import db.prob.datalog.query.Absyn.operators.QueryJoin;
 import db.prob.datalog.query.Absyn.operators.QuerySelection;
 import db.prob.datalog.query.FunctionalDependency.FunctionalDependency;
 import db.prob.mr.plan.ra.RAExpression;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -83,17 +84,12 @@ public class SafePlanTest {
     	 */
     	Relation relationS = new Relation("S", new String[] {"A","B"}, true);
     	Relation relationT = new Relation("T", new String[] {"C","D"}, true);
-    	Set<FunctionalDependency> fdSet = new HashSet<FunctionalDependency>();
-    	DatabaseSchema db = new DatabaseSchema(new Relation[] {relationS, relationT}, fdSet);
+    	Set<FunctionalDependency> fds = new HashSet<FunctionalDependency>();
+    	DatabaseSchema db = new DatabaseSchema(new Relation[] {relationS, relationT}, fds);
 
-        Set<RelationAttribute> left  = new HashSet<RelationAttribute>();
-    	Set<RelationAttribute> right = new HashSet<RelationAttribute>();
-        left.add(relationT.getAttrByName("C"));
-        right.add(relationT.getAttrByName("D"));
-
-        // C -> D
-    	FunctionalDependency fd1 = new FunctionalDependency(db, left, right);
-    	fdSet.add(fd1);
+        // FD: C -> D
+    	FunctionalDependency fd1 = createFd(db, relationT, new String[] {"C"}, new String[] {"D"});
+    	fds.add(fd1);
 
         // Now the query:
         HashSet<RelationAttribute> head = new HashSet<RelationAttribute>();
@@ -106,8 +102,70 @@ public class SafePlanTest {
         Query q = new Query(db, "shoki", head, body);
         System.out.println(q.toString());
         RAExpression out = SafePlan.buildSafePlan(q);
-        System.out.println(out.toLatex());
+        System.out.println(out.toLatex());    	
+    }
+    
+    @Test
+    public void testFromMyPaper() throws Exception  {
+    	/*
+    	 * This is the query from Yaron's paper.
+    	 * We have 3 relations: Emp(eid,name,did,rid), Dept(did,dname), Rank(rid,rname)
+    	 * the query is : q(did,rid) := Emp(eid,name,did,rid), Dept(did,dname), Rank(rid,rname),did=did,rid=rid
+    	 */
+    	Relation emp  = new Relation("Emp",  new String[] {"eid","name", "did", "rid"}, true);
+    	Relation dept = new Relation("Dept", new String[] {"did","dname"}, true);
+    	Relation rank = new Relation("Rank", new String[] {"rid","rname"}, true);
+    	
+    	Set<FunctionalDependency> fds = new HashSet<FunctionalDependency>();
+    	DatabaseSchema db = new DatabaseSchema(new Relation[] {emp, dept, rank}, fds);
+
+        // FD1: eid -> name, did, rid
+    	FunctionalDependency fd1 = createFd(db, emp, new String[] {"eid"}, new String[] {"name", "did", "rid"});
+    	fds.add(fd1);
+
+        // FD2: did -> dname        
+    	FunctionalDependency fd2 = createFd(db, dept, new String[] {"did"}, new String[] {"dname"});
+    	fds.add(fd2);
+
+        // FD3: did -> dname        
+    	FunctionalDependency fd3 = createFd(db, rank, new String[] {"rid"}, new String[] {"rname"});
+    	fds.add(fd3);
 
     	
+        // Now the query:
+        HashSet<RelationAttribute> head = new HashSet<RelationAttribute>();
+        head.add(emp.getAttrByName("did"));
+        head.add(emp.getAttrByName("rid"));
+    	
+        QuerySelection sEmp  = new QuerySelection(emp,  new HashSet<String>(Arrays.asList("eid", "name", "did", "rid")));
+        QuerySelection sDept = new QuerySelection(dept, new HashSet<String>(Arrays.asList("did", "dname")));
+        QuerySelection sRank = new QuerySelection(rank, new HashSet<String>(Arrays.asList("rid", "rname")));
+        
+        QueryJoin joinEmpAndDept = new QueryJoin(emp.getAttrByName("did"), dept.getAttrByName("did"));
+        QueryJoin joinEmpAndRank = new QueryJoin(emp.getAttrByName("rid"), rank.getAttrByName("rid"));
+        
+        List<Literal> body = Arrays.asList(sEmp, sDept, sRank, joinEmpAndDept, joinEmpAndRank);
+        
+        Query q = new Query(db, "shoki", head, body);
+        System.out.println(q.toString());
+        RAExpression out = SafePlan.buildSafePlan(q);
+        System.out.println(out.toLatex());
     }
+    
+    private FunctionalDependency createFd(DatabaseSchema db, Relation rel, String[] lHandAttr, String[] rHandAttr) throws Exception {
+    	FunctionalDependency fd = null;
+    	Set<RelationAttribute> fdLeftHand  = new HashSet<RelationAttribute>();
+    	Set<RelationAttribute> fdRightHand = new HashSet<RelationAttribute>();
+    	for (String attr : lHandAttr) {
+			fdLeftHand.add(rel.getAttrByName(attr));
+		}
+    	for (String attr : rHandAttr) {
+			fdRightHand.add(rel.getAttrByName(attr));
+		}
+    	
+    	fd = new FunctionalDependency(db, fdLeftHand, fdRightHand);
+    	
+    	return fd;
+    }
+    
 }
