@@ -88,7 +88,7 @@ public class SafePlanTest {
     	DatabaseSchema db = new DatabaseSchema(new Relation[] {relationS, relationT}, fds);
 
         // FD: C -> D
-    	FunctionalDependency fd1 = createFd(db, relationT, new String[] {"C"}, new String[] {"D"});
+    	FunctionalDependency fd1 = FunctionalDependency.createFd(db, relationT, new String[] {"C"}, new String[] {"D"});
     	fds.add(fd1);
 
         // Now the query:
@@ -120,15 +120,15 @@ public class SafePlanTest {
     	DatabaseSchema db = new DatabaseSchema(new Relation[] {emp, dept, rank}, fds);
 
         // FD1: eid -> name, did, rid
-    	FunctionalDependency fd1 = createFd(db, emp, new String[] {"eid"}, new String[] {"name", "did", "rid"});
+    	FunctionalDependency fd1 = FunctionalDependency.createFd(db, emp, new String[] {"eid"}, new String[] {"name", "did", "rid"});
     	fds.add(fd1);
 
         // FD2: did -> dname        
-    	FunctionalDependency fd2 = createFd(db, dept, new String[] {"did"}, new String[] {"dname"});
+    	FunctionalDependency fd2 = FunctionalDependency.createFd(db, dept, new String[] {"did"}, new String[] {"dname"});
     	fds.add(fd2);
 
         // FD3: did -> dname        
-    	FunctionalDependency fd3 = createFd(db, rank, new String[] {"rid"}, new String[] {"rname"});
+    	FunctionalDependency fd3 = FunctionalDependency.createFd(db, rank, new String[] {"rid"}, new String[] {"rname"});
     	fds.add(fd3);
 
     	
@@ -151,21 +151,5 @@ public class SafePlanTest {
         RAExpression out = SafePlan.buildSafePlan(q);
         System.out.println(out.toLatex());
     }
-    
-    private FunctionalDependency createFd(DatabaseSchema db, Relation rel, String[] lHandAttr, String[] rHandAttr) throws Exception {
-    	FunctionalDependency fd = null;
-    	Set<RelationAttribute> fdLeftHand  = new HashSet<RelationAttribute>();
-    	Set<RelationAttribute> fdRightHand = new HashSet<RelationAttribute>();
-    	for (String attr : lHandAttr) {
-			fdLeftHand.add(rel.getAttrByName(attr));
-		}
-    	for (String attr : rHandAttr) {
-			fdRightHand.add(rel.getAttrByName(attr));
-		}
-    	
-    	fd = new FunctionalDependency(db, fdLeftHand, fdRightHand);
-    	
-    	return fd;
-    }
-    
+        
 }
