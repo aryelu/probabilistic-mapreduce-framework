@@ -1,6 +1,7 @@
 package db.prob.datalog.query.FunctionalDependency;
 
 import db.prob.datalog.query.Absyn.Schema.DatabaseSchema;
+import db.prob.datalog.query.Absyn.Schema.Relation;
 import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 
 import java.util.HashSet;
@@ -33,7 +34,10 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
      * @return
      */
     public static Set<FunctionalDependency> produceFdFromSet(
-    		DatabaseSchema schema, Set<Set<RelationAttribute>> leftSet, Set<Set<RelationAttribute>> rightSet) {
+    		DatabaseSchema schema, 
+    		Set<Set<RelationAttribute>> leftSet, 
+    		Set<Set<RelationAttribute>> rightSet) {
+    	
         Set<FunctionalDependency> fd_set = new HashSet<FunctionalDependency>();
         for (Set<RelationAttribute> ls_item : leftSet) {
             for (Set<RelationAttribute> rs_item : rightSet) {
@@ -59,6 +63,35 @@ public class FunctionalDependency extends IFunctionalDependency implements IFunc
         singleton.add(relationAttributeSet);
         return FunctionalDependency.produceFdFromSet(schema, singleton, powerSet);
     }
+    
+    /**
+     * a helper method to create a {@link FunctionalDependency} object on a single relation.
+     * 
+     * @param db        database schema
+     * @param rel       relation
+     * @param lHandAttr left hand side of the FD
+     * @param rHandAttr right hand side of the FD
+     * @return a new instance of FD
+     * @throws Exception
+     */
+    public static FunctionalDependency createFd(DatabaseSchema db, Relation rel, String[] lHandAttr, String[] rHandAttr) throws Exception {
+    	FunctionalDependency fd = null;
+    	Set<RelationAttribute> fdLeftHand  = new HashSet<RelationAttribute>();
+    	Set<RelationAttribute> fdRightHand = new HashSet<RelationAttribute>();
+    	
+    	for (String attr : lHandAttr) {
+			fdLeftHand.add(rel.getAttrByName(attr));
+		}
+    	
+    	for (String attr : rHandAttr) {
+			fdRightHand.add(rel.getAttrByName(attr));
+		}
+    	
+    	fd = new FunctionalDependency(db, fdLeftHand, fdRightHand);
+    	
+    	return fd;
+    }
+    
 
     /**
      * apply reflexivity rule on self and return set of all possible FD for a
