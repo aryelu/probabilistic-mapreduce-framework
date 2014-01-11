@@ -36,12 +36,12 @@ public class SafePlan {
             Set<Relation> removeLeftRelationSet = new HashSet<Relation>();
             Relation left_relation = queryJoin.getLeftRelation();
             removeLeftRelationSet.add(left_relation);
-            Query query_without_left = query.project_on_relation_set(removeLeftRelationSet, "removed_" + left_relation.getName());
+            Query query_without_left = query.projectOnRelationSet(removeLeftRelationSet, "removed_" + left_relation.getName());
 
             Set<Relation> removeRightRelationSet = new HashSet<Relation>();
             Relation right_relation = queryJoin.getRightRelation();
             removeRightRelationSet.add(right_relation);
-            Query query_without_right = query.project_on_relation_set(removeRightRelationSet, "removed_" + right_relation.getName());
+            Query query_without_right = query.projectOnRelationSet(removeRightRelationSet, "removed_" + right_relation.getName());
 
             RAExpression ans = new Join(SafePlan.getJoins(query_without_right), SafePlan.getJoins(query_without_left), queryJoin.getLeftName(), queryJoin.getRightName());
             return ans;
@@ -91,6 +91,7 @@ public class SafePlan {
      * @throws Exception
      */
     public static RAExpression buildSafePlan(Query query) throws Exception {
+        System.out.println(query);
         Set<RelationAttribute> head = query.getHead();
         Set<RelationAttribute> attr = query.getAttribues();
         Set<RelationAttribute> diff = new HashSet<RelationAttribute>(attr);
@@ -149,16 +150,19 @@ public class SafePlan {
         }
 
         List<Set<Relation>> relationConnectedSet = connectivityInspector.connectedSets();
-        if (relationConnectedSet.size() == 2) {
+        if (relationConnectedSet.size() >= 2) {
             // find all leq that has one node in first set and second in the second set
 
             Set<Relation> relationConnectedSet_left = relationConnectedSet.get(0);
-            Query left_query = query.project_on_relation_set(relationConnectedSet_left, "l");
+            Query left_query = query.projectOnRelationSet(relationConnectedSet_left, "l");
+            relationConnectedSet.remove(0);
 
-            Set<Relation> relationConnectedSet_right = relationConnectedSet.get(1);
-            Query right_query = query.project_on_relation_set(relationConnectedSet_right, "r");
-
-            List<QueryJoin> queryJoinList = query.bodyGetJoinsBetweenConnectedSet(relationConnectedSet_left, relationConnectedSet_right);
+            HashSet<Relation> relationConnectedSetTail = new HashSet<Relation>();
+            for (Set<Relation> relationSet : relationConnectedSet) {
+                relationConnectedSetTail.addAll(relationSet);
+            }
+            Query right_query = query.projectOnRelationSet(relationConnectedSetTail, "r");
+            List<QueryJoin> queryJoinList = query.bodyGetJoinsBetweenConnectedSet(relationConnectedSet_left, relationConnectedSetTail);
 
             // TODO deduct there is always one
             // select first

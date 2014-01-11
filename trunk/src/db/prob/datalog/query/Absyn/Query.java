@@ -145,16 +145,17 @@ public class Query {
         throw new NullPointerException("can't find Relation" + relation + "in query's body");
     }
 
-    private List<Literal> get_literal_by_relation_set(Set<Relation> relationConnectedSet) {
+    private List<Literal> getLiteralByRelationSet(Set<Relation> relationConnectedSet) {
         List<Literal> literalSet = new LinkedList<Literal>();
+        literalSet.addAll(this.bodyGetJoinByRelationSet(relationConnectedSet));
+        // TODO fix this
         for (Relation relation : relationConnectedSet) {
             literalSet.add(this.body_get_selection_by_relation(relation));
-            literalSet.addAll(this.body_get_join_by_relation(relation));
         }
         return literalSet;
     }
 
-    public Set<RelationAttribute> body_get_attribute_by_set(Set<Relation> relationSet) {
+    public Set<RelationAttribute> bodyGetAttributeBySet(Set<Relation> relationSet) {
         Set<RelationAttribute> relationAttributeSet = new HashSet<RelationAttribute>();
         for (Relation relation : relationSet) {
             relationAttributeSet.addAll(this.body_get_selection_by_relation(relation).getAttributes());
@@ -166,7 +167,7 @@ public class Query {
      * @param req_set set of attributes which LiterlEQ should be in
      * @return list of all Join Operator where attribute appear
      */
-    private List<QueryJoin> body_get_join_by_attribute_set(Set<RelationAttribute> req_set) {
+    private List<QueryJoin> bodyGetJoinByAttributeSet(Set<RelationAttribute> req_set) {
         List<QueryJoin> leq_list = new LinkedList<QueryJoin>();
         for (Literal l : this.body) {
             if (l instanceof QueryJoin) {
@@ -180,16 +181,15 @@ public class Query {
     }
 
     /**
-     * @param relation relation which joins were interested
-     * @return all QueryJoin who's left or right part is attribute from this relation
+     * @param relationSet relationSet which joins were interested
+     * @return all QueryJoin who's left or right part is attribute from this relationSet
      */
-    private List<QueryJoin> body_get_join_by_relation(Relation relation) {
+    private List<QueryJoin> bodyGetJoinByRelationSet(Set<Relation> relationSet) {
         List<QueryJoin> leq_list = new LinkedList<QueryJoin>();
         for (Literal l : this.body) {
             if (l instanceof QueryJoin) {
                 QueryJoin leq = (QueryJoin) l;
-                if (relation.getAttributesSet().contains(leq.termRight) &&
-                        relation.getAttributesSet().contains(leq.termLeft)) {
+                if (leq.isInRelationSet(relationSet)) {
                     leq_list.add(leq);
                 }
             }
@@ -252,14 +252,14 @@ public class Query {
         Set<RelationAttribute> Rb_attr_set = Rb.getAttributes();
         set_from_rels.addAll(Rb_attr_set);
 
-        List<QueryJoin> bodyJoinLiteralList = this.body_get_join_by_attribute_set(set_from_rels);
+        List<QueryJoin> bodyJoinLiteralList = this.bodyGetJoinByAttributeSet(set_from_rels);
 
         boolean is_connected = false;
         for (QueryJoin leq : bodyJoinLiteralList) {
             is_connected = this.test_connected(leq);
             // break fast
             if (is_connected) {
-                return is_connected;
+                break;
             }
         }
         return is_connected;
@@ -359,7 +359,7 @@ public class Query {
      * @param name                 new name for query
      * @return
      */
-    public Query project_on_relation_set(Set<Relation> relationConnectedSet, String name) {
+    public Query projectOnRelationSet(Set<Relation> relationConnectedSet, String name) {
         DatabaseSchema databaseSchema = this.schema;
         String newQueryName = this.name + name;
         Set<RelationAttribute> validAttribute = new HashSet<RelationAttribute>();
@@ -368,7 +368,7 @@ public class Query {
         }
         Set<RelationAttribute> newQueryHead = new HashSet<RelationAttribute>(this.head);
         newQueryHead.retainAll(validAttribute);
-        List<Literal> newQueryBody = this.get_literal_by_relation_set(relationConnectedSet);
+        List<Literal> newQueryBody = this.getLiteralByRelationSet(relationConnectedSet);
         Query newQuery = new Query(databaseSchema, newQueryName, newQueryHead, newQueryBody);
         return newQuery;
     }
@@ -382,8 +382,8 @@ public class Query {
      * @return
      */
     public List<QueryJoin> bodyGetJoinsBetweenConnectedSet(Set<Relation> relationConnectedSetLeft, Set<Relation> relationConnectedSetRight) {
-        Set<RelationAttribute> leftSet = this.body_get_attribute_by_set(relationConnectedSetLeft);
-        Set<RelationAttribute> rightSet = this.body_get_attribute_by_set(relationConnectedSetRight);
+        Set<RelationAttribute> leftSet = this.bodyGetAttributeBySet(relationConnectedSetLeft);
+        Set<RelationAttribute> rightSet = this.bodyGetAttributeBySet(relationConnectedSetRight);
 
         List<QueryJoin> leq_list = new LinkedList<QueryJoin>();
         for (Literal l : this.body) {
@@ -401,12 +401,7 @@ public class Query {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.head);
-        sb.append(" :- ");
-        sb.append(this.body);
-
-        return sb.toString();
+        return String.valueOf(this.head) + " :- " + this.body;
     }
 
 
