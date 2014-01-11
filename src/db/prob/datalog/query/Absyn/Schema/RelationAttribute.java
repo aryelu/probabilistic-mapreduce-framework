@@ -22,6 +22,6 @@ public class RelationAttribute {
     }
     
     public String toString(){
-        return this.relation.getName() + "." + this.name;
+        return this.name;
     }
 }
