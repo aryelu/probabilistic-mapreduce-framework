@@ -11,6 +11,7 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -84,7 +85,7 @@ public class SafePlan {
 
     /**
      * Builds a safe execution plan for the given query.
-     * 
+     *
      * @param query Query to build safe plan for
      * @return Safe plan for query if exists
      * @throws Exception
@@ -170,6 +171,6 @@ public class SafePlan {
         // TODO - handle more than two connected sets
         // build new Queries from this,
         // head, and body
-        return null;
+        throw new NotImplementedException();
     }
 }

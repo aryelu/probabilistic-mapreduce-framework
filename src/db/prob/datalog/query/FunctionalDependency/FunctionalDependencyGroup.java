@@ -22,7 +22,7 @@ public class FunctionalDependencyGroup extends IFunctionalDependency implements 
 
     public FunctionalDependencyGroup(DatabaseSchema schema, Set<FunctionalDependency> fd_set) {
         super(schema);
-        this.fd_set = fd_set;
+        this.fd_set = new HashSet<FunctionalDependency>(fd_set);
     }
 
     @Override
@@ -72,23 +72,32 @@ public class FunctionalDependencyGroup extends IFunctionalDependency implements 
         return fd_transitive;
     }
 
-    public Set<FunctionalDependency> f_closure() {
-        Set<FunctionalDependency> fd_closure_before = Collections.emptySet();
-        Set<FunctionalDependency> fd_closure_curr = this.fd_set;
-        //TODO remove self refrencing
-        while (!fd_closure_before.equals(fd_closure_curr)) {
-            fd_closure_before = new HashSet<FunctionalDependency>(this.fd_set);
-            this.fd_set.addAll(this.reflexivity());
-            this.fd_set.addAll(this.augmentation());
-            this.fd_set.addAll(this.transitivity());
-            fd_closure_curr = this.fd_set;
+    public void f_closure() {
+        this.fd_set.addAll(this.reflexivity());
+        this.fd_set.addAll(this.augmentation());
+        //this.fd_set.addAll(this.transitivity());
+    }
+
+    public boolean statisfyAttributeSet(FunctionalDependency wanted_fd) {
+        Set<RelationAttribute> result = new HashSet<RelationAttribute>(wanted_fd.get_left());
+        Set<RelationAttribute> prev_result = Collections.emptySet();
+        boolean found = false;
+        while (!prev_result.equals(result) && !found) {
+            prev_result = new HashSet<RelationAttribute>(result);
+            for (FunctionalDependency fd : this.fd_set) {
+                if (result.containsAll(fd.get_left())) {
+                    result.addAll(fd.get_right());
+                }
+
+            }
+            found = result.containsAll(wanted_fd.get_right());
         }
-        return this.fd_set;
+        return found;
     }
 
     public boolean statisfy(FunctionalDependency fd) {
-        Set<FunctionalDependency> closure = this.f_closure();
-        return closure.contains(fd);
+        this.f_closure();
+        return statisfyAttributeSet(fd);
     }
 
 }
