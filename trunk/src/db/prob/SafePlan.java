@@ -65,6 +65,11 @@ public class SafePlan {
      */
     private static RAExpression simple_query_to_plan(Query query) throws Exception {
         // turn body into joins
+        if (query.isSingleSelection()) {
+            Set<Relation> relationSet = query.getRelationSet();
+            Relation relation = relationSet.iterator().next();
+            return new db.prob.mr.plan.ra.Relation(0, relation.getName());
+        }
         Projection proj = new Projection(SafePlan.getJoins(query), query.getHeadToStringSet());
         return proj;
     }
@@ -91,7 +96,6 @@ public class SafePlan {
      * @throws Exception
      */
     public static RAExpression buildSafePlan(Query query) throws Exception {
-        System.out.println(query);
         Set<RelationAttribute> head = query.getHead();
         Set<RelationAttribute> attr = query.getAttribues();
         Set<RelationAttribute> diff = new HashSet<RelationAttribute>(attr);

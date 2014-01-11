@@ -405,4 +405,7 @@ public class Query {
     }
 
 
+    public boolean isSingleSelection() {
+        return this.body.size() == 1;
+    }
 }
