@@ -11,7 +11,6 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -176,9 +175,6 @@ public class SafePlan {
 
             return new Join(buildSafePlan(left_query), buildSafePlan(right_query), left.getName(), right.getName());
         }
-        // TODO - handle more than two connected sets
-        // build new Queries from this,
-        // head, and body
-        throw new NotImplementedException();
+        throw new Exception("This is madness");
     }
 }
