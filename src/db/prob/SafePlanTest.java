@@ -77,6 +77,7 @@ public class SafePlanTest {
         /*
     	 * This is the query in Suciu's paper.
     	 * We have two relations: S(A,B) and T(C,D)
+    	 * And a FD: C -> D
     	 * the query is : q(D) := S(A,B),T(C,D),B=C
     	 */
         Relation relationS = new Relation("S", new String[]{"A", "B"}, true);
@@ -100,7 +101,10 @@ public class SafePlanTest {
         System.out.println(q.toString());
         RAExpression out = SafePlan.buildSafePlan(q);
         System.out.println(out.toLatex());
+        System.out.println();
     }
+    
+    
 
     @Test
     public void testFromMyPaper() throws Exception {
@@ -147,6 +151,89 @@ public class SafePlanTest {
         System.out.println(q.toString());
         RAExpression out = SafePlan.buildSafePlan(q);
         System.out.println(out.toLatex());
+        System.out.println();
+    }
+
+    @Test
+    public void testFromMyPaper2() throws Exception {
+    	/*
+    	 * This is the query from Yaron's paper.
+    	 * We have 3 relations: Emp(eid,name,did,rid), Dept(did,dname), Rank(rid,rname)
+    	 * the query is : q(did,rid) := Emp(eid,name,did,rid), Dept(did,dname), Rank(rid,rname),did=did,rid=rid
+    	 */
+        Relation emp = new Relation("Emp", new String[]{"eid", "name", "did", "rid"}, true);
+        Relation dept = new Relation("Dept", new String[]{"did", "dname"}, true);
+        Relation rank = new Relation("Rank", new String[]{"rid", "rname"}, true);
+
+        Set<FunctionalDependency> fds = new HashSet<FunctionalDependency>();
+        DatabaseSchema db = new DatabaseSchema(new Relation[]{emp, dept, rank}, fds);
+
+        // FD1: eid -> name, did, rid
+        FunctionalDependency fd1 = FunctionalDependency.createFd(db, emp, new String[]{"eid"}, new String[]{"name", "did", "rid"});
+        fds.add(fd1);
+
+        // FD2: did -> dname        
+        FunctionalDependency fd2 = FunctionalDependency.createFd(db, dept, new String[]{"did"}, new String[]{"dname"});
+        fds.add(fd2);
+
+        // FD3: did -> dname        
+        FunctionalDependency fd3 = FunctionalDependency.createFd(db, rank, new String[]{"rid"}, new String[]{"rname"});
+        fds.add(fd3);
+
+
+        // Now the query:
+        HashSet<RelationAttribute> head = new HashSet<RelationAttribute>();
+        head.add(dept.getAttrByName("dname"));
+        //head.add(emp.getAttrByName("rid"));
+
+        QuerySelection sEmp = new QuerySelection(emp, new HashSet<String>(Arrays.asList("eid", "name", "did", "rid")));
+        QuerySelection sDept = new QuerySelection(dept, new HashSet<String>(Arrays.asList("did", "dname")));
+        QuerySelection sRank = new QuerySelection(rank, new HashSet<String>(Arrays.asList("rid", "rname")));
+
+        QueryJoin joinEmpAndDept = new QueryJoin(emp.getAttrByName("did"), dept.getAttrByName("did"));
+        QueryJoin joinEmpAndRank = new QueryJoin(emp.getAttrByName("rid"), rank.getAttrByName("rid"));
+
+        List<Literal> body = Arrays.asList(sEmp, sDept, sRank, joinEmpAndDept, joinEmpAndRank);
+
+        Query q = new Query(db, "shoki", head, body);
+        System.out.println(q.toString());
+        RAExpression out = SafePlan.buildSafePlan(q);
+        System.out.println(out.toLatex());
+        System.out.println();
+    }
+
+    @Test
+    public void testFromSuciuPaper2() throws Exception {
+        /*
+    	 * This is a variation on the query in Suciu's paper.
+    	 *  
+    	 * We have two relations: S(A,B) and T(C,D)
+    	 * And a FD: C -> D
+    	 * the query is : q(A) := S(A,B),T(C,D),B=C
+    	 */
+        Relation relationS = new Relation("S", new String[]{"A", "B"}, true);
+        Relation relationT = new Relation("T", new String[]{"C", "D"}, true);
+        Set<FunctionalDependency> fds = new HashSet<FunctionalDependency>();
+        DatabaseSchema db = new DatabaseSchema(new Relation[]{relationS, relationT}, fds);
+
+        // FD: C -> D
+        FunctionalDependency fd1 = FunctionalDependency.createFd(db, relationT, new String[]{"C"}, new String[]{"D"});
+        fds.add(fd1);
+
+        // Now the query:
+        HashSet<RelationAttribute> head = new HashSet<RelationAttribute>();
+        head.add(relationS.getAttrByName("A"));
+
+        QuerySelection selectS = new QuerySelection(relationS, new HashSet<String>(Arrays.asList("A", "B")));
+        QuerySelection selectT = new QuerySelection(relationT, new HashSet<String>(Arrays.asList("C", "D")));
+        QueryJoin joinSandT = new QueryJoin(relationS.getAttrByName("B"), relationT.getAttrByName("C"));
+        List<Literal> body = Arrays.asList(selectS, selectT, joinSandT);
+        Query q = new Query(db, "shoki", head, body);
+        System.out.println(q.toString());
+        RAExpression out = SafePlan.buildSafePlan(q);
+        System.out.println(out.toLatex());
+        System.out.println();
     }
 
 }
+
