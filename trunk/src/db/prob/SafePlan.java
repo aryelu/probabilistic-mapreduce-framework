@@ -62,7 +62,7 @@ public class SafePlan {
      * @param query
      * @return
      */
-    private static RAExpression simple_query_to_plan(Query query) throws Exception {
+    private static RAExpression makeSimplePlan(Query query) throws Exception {
         // turn body into joins
         if (query.isSingleSelection()) {
             Set<Relation> relationSet = query.getRelationSet();
@@ -96,20 +96,21 @@ public class SafePlan {
      */
     public static RAExpression buildSafePlan(Query query) throws Exception {
         Set<RelationAttribute> head = query.getHead();
-        Set<RelationAttribute> attr = query.getAttribues();
-        Set<RelationAttribute> diff = new HashSet<RelationAttribute>(attr);
+        Set<RelationAttribute> attrs = query.getAttribues();
+        Set<RelationAttribute> diff = new HashSet<RelationAttribute>(attrs);
         diff.removeAll(head);
 
-        if (head.equals(attr)) {
+        if (head.equals(attrs)) {
             // make plan from query as-is and return it
-            return simple_query_to_plan(query);
+            return makeSimplePlan(query);
         }
-        for (RelationAttribute diff_attr : diff) {
+        for (RelationAttribute attr : diff) {
             // create new query with diff_attr in it's head
 
-            Query query_add_a = query.query_add_head(diff_attr);
-            if (Query.isProjectionSafe(query_add_a, head)) {
-                return new Projection(buildSafePlan(query_add_a), setToString(head));
+        	// This is q_{A} from the paper.
+            Query queryA = query.addToHead(attr);
+            if (Query.isProjectionSafe(queryA, head)) {
+                return new Projection(buildSafePlan(queryA), setToString(head));
             }
         }
         // split query to into q1 join q2

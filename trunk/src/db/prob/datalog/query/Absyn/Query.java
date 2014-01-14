@@ -114,16 +114,16 @@ public class Query {
     }
 
     /**
-     * Creates a new query with attr added to it's head
+     * Creates a new instance of query with attr added to it's head
      *
      * @param attr attribute to be added
      * @return new query
      */
-    public Query query_add_head(RelationAttribute attr) {
-        Query new_query = new Query(this);
-        new_query.name = this.name + "_" + attr;
-        new_query.head.add(attr);
-        return new_query;
+    public Query addToHead(RelationAttribute attr) {
+        Query newQuery = new Query(this);
+        newQuery.name = this.name + "_" + attr;
+        newQuery.head.add(attr);
+        return newQuery;
     }
 
     /**
@@ -226,7 +226,8 @@ public class Query {
         if (this.head.contains(queryJoin.termLeft)) {
             connection++;
         }
-        return connection == 1;
+        //YGYG return connection == 1;
+        return connection < 2;
     }
 
     /**
