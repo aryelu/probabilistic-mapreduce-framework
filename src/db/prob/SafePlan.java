@@ -5,6 +5,7 @@ import db.prob.datalog.query.Absyn.Schema.Relation;
 import db.prob.datalog.query.Absyn.Schema.RelationAttribute;
 import db.prob.datalog.query.Absyn.operators.QueryJoin;
 import db.prob.mr.plan.ra.RAExpression;
+import db.prob.mr.plan.ra.operators.CartesianProduct;
 import db.prob.mr.plan.ra.operators.Join;
 import db.prob.mr.plan.ra.operators.Projection;
 import org.jgrapht.UndirectedGraph;
@@ -48,10 +49,16 @@ public class SafePlan {
         // no joins left then select with what we have
         // need to be from the same relation
         Set<Relation> relationSet = query.getRelationSet();
-        if (!relationSet.isEmpty() && relationSet.size() == 1) {
-            Relation relation = (Relation) relationSet.toArray()[0];
-            RAExpression ans = new db.prob.mr.plan.ra.Relation(1, relation.getName());
-            return ans;
+        RAExpression ans2;
+        if (!relationSet.isEmpty()) {
+            if (relationSet.size() == 1){
+                Relation relation = (Relation) relationSet.toArray()[0];
+                ans2 = new db.prob.mr.plan.ra.Relation(1, relation.getName());
+            }
+            else{
+                ans2 = new CartesianProduct(relationSet);
+            }
+            return ans2;
         }
         throw new Exception("Can't figure out");
     }
@@ -69,6 +76,7 @@ public class SafePlan {
             Relation relation = relationSet.iterator().next();
             return new db.prob.mr.plan.ra.Relation(0, relation.getName());
         }
+
         Projection proj = new Projection(SafePlan.getJoins(query), query.getHeadToStringSet());
         return proj;
     }

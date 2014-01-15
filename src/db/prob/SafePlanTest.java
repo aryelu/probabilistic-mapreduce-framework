@@ -154,7 +154,7 @@ public class SafePlanTest {
         System.out.println();
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void testFromMyPaper2() throws Exception {
     	/*
     	 * This is the query from Yaron's paper.
@@ -197,6 +197,7 @@ public class SafePlanTest {
 
         Query q = new Query(db, "shoki", head, body);
         System.out.println(q.toString());
+
         RAExpression out = SafePlan.buildSafePlan(q);
         System.out.println(out.toLatex());
         System.out.println();
