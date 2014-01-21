@@ -54,11 +54,27 @@ public class DatabaseSchema {
         return fdSet;
     }
 
-    public Set<RelationAttribute> get_relation_attribute() {
-        Set<RelationAttribute> attr_set = new HashSet<RelationAttribute>();
+    /**
+     * Gets all attributes from all relations
+     * 
+     * @return
+     */
+    public Set<RelationAttribute> getAllRelationsAttributes() {
+        Set<RelationAttribute> attrs = new HashSet<RelationAttribute>();
         for (Relation relation : this.relations) {
-            attr_set.addAll(relation.getAttributesSetAndProb());
+            attrs.addAll(relation.getAttributesSetAndProb());
         }
-        return attr_set;
+        return attrs;
+    }
+    
+    public Relation getRelation(String relName) {
+    	Relation rel = null;
+    	for (Relation currRel : this.relations) {
+			if (currRel.getName() == relName) {
+				rel = currRel;
+				break;
+			}
+		}
+    	return rel;
     }
 }

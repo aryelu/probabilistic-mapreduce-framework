@@ -26,7 +26,7 @@ public abstract class IFunctionalDependency {
 
     protected Set<Set<RelationAttribute>> schema_attr_power() {
         if (this.schema_attr_power == null) {
-            this.schema_attr_power = powerSet(this.schema.get_relation_attribute());
+            this.schema_attr_power = powerSet(this.schema.getAllRelationsAttributes());
         }
         return this.schema_attr_power;
     }
@@ -51,7 +51,7 @@ public abstract class IFunctionalDependency {
     }
 
     public Set<RelationAttribute> schema_get_attr() {
-        return schema.get_relation_attribute();
+        return schema.getAllRelationsAttributes();
     }
 
     public DatabaseSchema get_schema() {
